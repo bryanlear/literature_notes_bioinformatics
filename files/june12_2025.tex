@@ -1,0 +1,243 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+\chapter{June $12^{th}/2025$}
+\label{ch:tufte-book}
+
+\section{Variant Effect Predictors (VEPS)}
+
+Computational tools whose primary function is to assess potential functional impact of genetic variants (particularly \textbf{missense}) which \textit{cause a change in AA sequence of a protein}. $\rightarrow$ crucial in addressing variants of unknown significance VUS.
+
+\hrulefill
+
+\section*{Foundational Principles}
+\subsection*{Evolutionary Conservation, Sequence Homology, and Structural Information}
+
+\begin{itemize}
+    \item \textbf{SIFT (Sorting Intolerant From Tolerant:} Operates on principle that important AA will be conserved throughout evolution. It predicts whether AA substitution will impact protein function by analyzing conservation across multiple species. 
+    \item \textbf{PolyPhen-2 (Polymorphism Phenotyping $v2$}: Predictor takes multifaceted approach. Evaluates physicochemical differences between AA, position of substitution within protein's structure, proximity to functional domains on top of evolutionary conservation.
+    \item \textbf{CADD (combined annotation dependent depletion):} Scores deleteriousness of variants by integrating multiple annotations. Trained by comparing a vast $set$ of observed human variations (mostly neutral) against simulated mutations to learn how to distinguish between them. Such approach allows to score coding and non-coding variants
+\end{itemize}
+
+\newthought{Modern AI-based VEPs} use $transformers-based$ architecture which allows model to weigh importance of different parts of the sequence to \textbf{understand context}. Thus it aims to learn fundamental language and rules of protein structure and function \textit{without being told} which variants are pathogenic.
+
+\hrulefill
+
+\newthought{Accurate proteome-wide missense variant effect prediction with AlphaMissense}\cite{doi:10.1126/science.adg7492} \cite{Jumper2021}
+\section*{$\alpha$-Missense} 
+By Google DeepMind. It predicts pathogenicity of missense variants. Architectures is inspired by $Evoformer$ block used in $\alpha$-fold 
+
+\vspace{0.3cm}
+
+\textit{\textbf{Core}} idea is to iteratively refine $2$ key representations:
+\begin{itemize}
+    \item \textbf{MSA representation}: Captures evolutionary information
+    \item \textbf{Pair representation:} Captures spatial and relational information between AA pairs
+\end{itemize}
+
+\subsection*{Input Representation:}
+
+\begin{itemize}
+    \item \textbf{Target Sequence:} Primary protein sequence of length $L$ is typically $one-hot$ encoded into matrix $S_{target} \in \{0, 1\}^{L \times 20}$, where 20 is AAs
+    \item \textbf{MSA Representation ($M$):} $N$ aligned sequences of length $L$ represented a tensor $M \in \mathbb{R}^{N \times L \times d_{msa}}$. Each position $(i, j)$ in tensor is an embedding for AA at residue $j$ in sequence $i$ of alignment
+    \item \textbf{Pair Representation ($P$):} Tensor $P \in \mathbb{R}^{L \times L \times d_{pair}}$ is initialized to store information about pairs of residues $(i, j)$. Can be initialized with info about relative positions of residues in the sequence, i.e., $j - i$.
+\end{itemize}
+
+\textbf{Pair Representation:} Tensor built and maintained by Evoformer. It stores and refine model's understanding of the relationship between every pair of residues in the protein.
+
+\vspace{0.3cm}
+
+Tensor $\mathrm{P}$ of dimensions $\mathrm{L} * \mathrm{L} * \mathrm{d_{pair}}$ where $\mathrm{L}$ length protein sequence and $\mathrm{d_{pair}}$ is $\#$ features the model stores for each pair. \textit{Just like L x L matrix but instead of scalar in ij, a high dimensional vector of features describing relationship between ij}
+
+\hrulefill
+
+\subsection*{Evoformer Block}
+The model consists of series of stacked Evoformer blocks. Each block takes $\mathrm{M}$ and $\mathrm{P}$ and outputs updated $\mathrm{M'}$ and $\mathrm{P'}$. Info is allowed to flow back and forth between MSA (evolutionary context) and implicit structural context (pair representation)
+
+\vspace{0.3cm}
+
+\textbf{\textit{\large{The Block:}}}
+
+\vspace{0.3cm}
+
+\textit{\large{MSA Representation Update (with Axial Attention}}
+MSA representation $M$ is updated using axial attention which is applied independently along the rows and columns.
+
+\vspace{0.3cm}
+
+\textit{\textbf{Row-wise Attention (within each sequence):}} For each sequence $i$ in MSA i.e. each row of $M$, standard self-attention mechanism is applied across residues $j=1,...,L$ $\rightarrow$ Model learns relationship between different residues within the same sequence. For a single row: 
+
+\begin{equation}
+    \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
+\end{equation}
+
+where $Q,K,V =$ linear projections of row's residue embeddings, augmented with information from the pair representation $P$. MSA representation is updated to $M_{row}$ 
+
+\vspace{0.3cm}
+
+\textit{\textbf{Column-wise Attention (across sequences):}} A second attention mechanism is applied to each column $j$ of intermediate MSA $M_{row}$ Model then learns which sequences in the alignment are most informative for x residue position. Capable of identifying highly conserved positions and co-evolving mutations across different sequences (signal for functional importance).
+
+\vspace{0.3cm}
+
+\textit{\large{Communication: MSA to Pair Representation}}
+
+\vspace{0.3cm}
+
+Information from updated MSA representation is used to update pair representation. Crucial step where \textit{evolutionary information informs spatial relationships}. 
+
+\vspace{0.3cm}
+
+\textit{\large{Some context:}}
+
+\textbf{Note that pair representation has been used in $2$ places within the single block up to this point.} This is the core cyclical logic of the Evoformer architecture $\rightarrow$ \textbf{Iterative refinement}(reasoning cycle). Model uses \textit{current} pair representation $P$ to \textit{bias}/\textit{guide} attention mechanism. 
+Thus instead of e.g., $Scores=QK^T$, it becomes $Scores=QK^T + Bias_{ij}$. A large $Bias_{ij}$ $=$ model is forced to focus on relationship between residues $i$ and $j$ when updating MSA representation.
+
+\begin{itemize}
+    \item Update is often achieved using $\otimes$-like operation on columns of MSA representation (correlation matrix). For a pair of residues $(i, j)$  model takes corresponding columns from MSA embedding, $M_{:,i}$ and $M_{:,j}$, and combines them. Simplified view of update for pair $(i, j)$:  
+    
+\begin{equation}
+    P'_{ij} = \text{LinearLayer}\left(\sum_{k=1}^{N} \left(W_1 M_{ki}\right) \otimes \left(W_2 M_{kj}\right)\right)
+ \end{equation}
+    
+\end{itemize}
+
+$\mathrm{M_{:,1}}$ is AA at \textbf{residue position} $i$ across all the different sequences in the alignment. Embedding captures evolutionary variation at that specific site in the protein, thus operation computes covariance matrix over MSA embeddings for each pair of residues \textbf{columns $\mathrm{M_{:,i}}$ and $M_{:,j}$} capturing co-evolutionary signals
+
+\vspace{0.3cm}
+
+\textit{\large{Pair Representation Update:}} Tensor $P$ undergoes own refinement using series of convolutional layers or axial attention layers or axial attention layers applied over $L*L$ grid. Analogous to refining distance so model is allowed to enforce geometric consistency rules like e.g.,triangle inequality, on the relationship between residues. $P'$ is fed back into MSA update in the next Evoformer block.
+
+\hrulefill
+
+\subsection*{Prediction Head and Pathogenicity Score}
+To make a prediction for a $x$ missense variant  (e.g., wiild type AA $a_{wt}$ at $i$ is replaced by $a_{mut}$ a prediction head is used.
+\begin{itemize}
+    \item Extract final embedding for residue $i$ from target sequence's representation $h_i \in \mathbb{R}^{d_{model}}$
+    \item During self-supervised pre-training, a classification head  (e.g., linear layer followed by $softmax$) is used to predict probability distribution over all $20$ AAs for $x$ position
+\end{itemize}
+
+\begin{equation}
+    \text{Logits} = W_{pretrain}h_i + b_{pretrain}
+\end{equation}
+
+
+\begin{equation}
+    P(\text{amino acid}_j|\text{context}) = \text{softmax}(\text{Logits})_j = \frac{e^{\text{logit}_j}}{\sum_{k=1}^{20} e^{\text{logit}_k}}
+\end{equation}
+
+For final pathogenicity prediction, fine-tuning process trains simpler head. Head takese final representation $h_i$ (which contains information about $a_{wt}$ and $a_{mut}$ context) and \textit{projects it to a single scalar value}. This is a \textbf{binary classification task}.
+
+\begin{equation}
+    \alpha = \sigma(W_{patho}h_i + b_{patho})
+\end{equation}
+
+$\alpha$ is final pathogenicity score
+
+\hrulefill
+
+\newthought{SIFT: predicting amino acid changes that affect protein function} \cite{Ng2003SIFT}
+
+\section{SIFT Algorithm}
+
+\textit{Evolutionary conservation}. It says that AA positions critical for a protein's structure/function will be conserved across homologous sequences from different species. Therefore, a substitution at a highly conserved position is likely to be deleterious, whereas a substitution at a highly variable position is more likely to be tolerated without significant functional consequence. SIFT quantifies this by calculating a score based on the probability of observing a particular A at a specific position, derived from a multiple sequence alignment (MSA).
+
+\subsection{Step 1: Multiple Sequence Alignment (MSA) Generation}
+
+Given a query protein sequence ,the first step is to gather set of homologous sequences from large protein database (e.g., Swiss-Prot/TrEMBL) using an algorithm like $PSI-BLAST$ (Position-Specific Iterated Basic Local Alignment Search Tool). Result is an MSA where related sequences are aligned, revealing \textit{patterns of conservation and variation at each position.}
+
+\subsection{Step 2: Position-Specific Probability Matrix (PSPM) Calculation}
+
+Core calculation in SIFT. For each position $i$ in the alignment, the algorithm computes a \textbf{probability distribution} over the $20$ AAs
+
+Let $P_{ij}$ be probability of AA $j$ occurring at position $i$. Probabilities are calculated from the \textbf{observed frequencies} of AAs at that position in the MSA. To handle sampling bias (e.g., over-representation of very similar sequences) and zero-frequency events (amino acids not seen at a position), a Bayesian approach using a Dirichlet mixture as prior probabilities is used
+
+Simplified  representation using pseudocounts:
+\begin{equation}
+P_{ij} = \frac{n_{ij} + b_j}{N_i + B}
+\end{equation}
+\begin{itemize}
+    \item $n_{ij}$ is weighted count of sequences in the MSA having AA $j$ at position $i$. Sequence weights are used to down-weight redundant, highly similar sequences
+    \item $N_i = \sum_{j=1}^{20} n_{ij}$ is total weighted count of sequences at position $i$
+    \item $b_j$ is the pseudocount for AA $j$. Derived from a prior probability distribution (substitution matrix e.g., BLOSUM$XX$)
+    \item $B = \sum_{j=1}^{20} b_j$ is the total number of pseudocounts
+\end{itemize}
+The set of these probabilities for a given position $i$, $\{P_{i1}, P_{i2}, \dots, P_{i,20}\}$, forms the Position-Specific Probability Matrix (a vector for position $i$) and satisfies:
+\begin{equation}
+\sum_{j=1}^{20} P_{ij} = 1
+\end{equation}
+
+\subsection{Step 3: SIFT Score Calculation and Classification}
+
+The SIFT score for a given substitution from the wild-type AA ($aa_{wt}$) to a mutant AA ($aa_{mut}$) at position $i$ is the probability of observing that mutant AA at that position, as derived from the PSPM.
+\begin{equation}
+\text{SIFT Score}(i, aa_{wt} \to aa_{mut}) = P_{i, aa_{mut}}
+\end{equation}
+This score is a \textit{measure of tolerance}. A high score (high probability) indicates that the substitution is commonly observed in homologs and is therefore predicted to be tolerated. A low score indicates the substitution is rare and likely not tolerated (deleterious).
+
+The final classification is made by applying a threshold, typically 0.05:
+\begin{equation}
+\text{Prediction} =
+\begin{cases}
+    \textbf{Deleterious} & \text{if SIFT Score} < 0.05 \\
+    \textbf{Tolerated} & \text{if SIFT Score} \geq 0.05
+\end{cases}
+\end{equation}
+
+\subsection{Step 4: Conservation Index}
+
+SIFT's predictions are more reliable for positions that are \textit{highly conserved}. \textbf{To quantify}, a conservation index is calculated for each position $i$, which is derived from the information content or negative of Shannon's Entropy of the probability distribution $P_i$.
+
+First, the Shannon's Entropy $H_i$ for position $i$ is calculated:
+\begin{equation}
+H_i = - \sum_{j=1}^{20} P_{ij} \log_2(P_{ij})
+\end{equation}
+The entropy $H_i$ is a measure of uncertainty/variability at position $i$. It ranges from 0 (perfect conservation, only $1$ AA is possible) to $\log_2(20)$ (all 20 AA equally likely).
+
+The Conservation Index $C_i$ is then the information content: difference between the maximum possible entropy and the observed entropy:
+\begin{equation}
+C_i = \log_2(20) - H_i
+\end{equation}
+A high conservation index ($C_i \to \log_2(20)$) indicates low entropy and high conservation, making SIFT prediction at that site more reliable. Likewise $C_i \to 0$ indicates high variability and predictions at such sites are considered less certain.
+
+\hrulefill
+
+\newthought{DNABERT: pre-trained Bidirectional Encoder Representations from Transformers model for DNA-language in genome} \cite{10.1093/bioinformatics/btab083}
+
+Methods to improve statistical power of gene-level association tests by partitioning rare variants into $K$ functional categories ($S_1, \dots, S_K$). Methods outperform standard tests that treat all variants equally especially when different functional categories have different magnitudes.
+
+\subsection*{Method 1: Omnibus SKAT (oSKAT)}
+
+Performs separate Sequence Kernel Association Test (SKAT) for each of $K$ variant sets yielding $K$ p-values ($p_1, \dots, p_K$). p-values are combined using \textit{Simes' method} to produce single gene-level p-value ( then adjust for correlation between tests)
+
+Simes' p-value:
+\begin{equation}
+p_{\text{Simes}} = \min_{i=1,\dots,K} \frac{K \cdot p_{(i)}}{i}
+\end{equation}
+where $p_{(i)}$ is $i$-th smallest p-value.
+
+\subsection*{Method 2: Functional SKAT (F-SKAT)}
+
+F-SKAT $=$ unified variance component test within single mixed model. Overall genetic effect for an individual, $\gamma_i$:
+\begin{equation}
+\gamma_i = \sum_{k=1}^K \gamma_{ik}, \quad \text{where} \quad \gamma_{ik} = \sum_{j \in S_k} w_j \beta_j G_{ij}
+\end{equation}
+Assumes variant effects $\beta_j$ for each category $k$ are random variables drawn from distribution with a category-specific variance component, $\tau_k$:
+\begin{equation}
+\beta_j \sim N(0, \tau_k) \quad \text{for } j \in S_k
+\end{equation}
+$H_0$ is  'all variance components are zero' $=$ no genetic effect from any category:
+\begin{equation}
+H_0: \tau_1 = \tau_2 = \dots = \tau_K = 0
+\end{equation}
+The F-SKAT score test statistic is an optimal linear combination of the individual SKAT statistics ($Q_k$) for each category:
+\begin{equation}
+Q_F = \sum_{k=1}^K \lambda_k Q_k
+\end{equation}
+This statistic follows mixture of $\chi^2$ distributions from which p-value can be derived.
+
+\hrulefill
+
+Simulations and real data analyses show F-SKAT is generally the most powerful and flexible approach.
+
+\end{document}

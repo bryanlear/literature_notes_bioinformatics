@@ -1,0 +1,111 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                MAIN DOCUMENT FILE (main.tex)
+%   This file contains the preamble and document structure.
+%          You will compile your PDF from this file.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass{tufte-book}
+
+% --- PREAMBLE ---
+% This section contains all the packages and custom commands from your original file.
+
+\hypersetup{colorlinks}
+
+% Book metadata
+\title{Literature Notes \\ Bioinformatics\thanks{Thanks to}}
+\author[bryan]{Bryan\ L.A.}
+\publisher{University of Amsterdam $\cap$ Vrije Universiteit}
+
+\usepackage{lipsum}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+\usepackage{xspace}
+\usepackage{units}
+\usepackage{makeidx}
+\usepackage{natbib}      % For citations
+\usepackage{subfiles}  
+\usepackage{amsmath, amssymb}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+% The key package for partitioning the document
+
+% Settings from original file
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{graphics/}} % Assumes a 'graphics' folder for images
+\fvset{fontsize=\normalsize}
+
+% All custom commands from your original file
+\newcommand{\hangp}[1]{\makebox[0pt][r]{(}#1\makebox[0pt][l]{)}}
+\newcommand{\hangstar}{\makebox[0pt][l]{*}}
+\newcommand{\vdqi}{\textit{VDQI}\xspace}
+\newcommand{\ei}{\textit{EI}\xspace}
+\newcommand{\ve}{\textit{VE}\xspace}
+\newcommand{\be}{\textit{BE}\xspace}
+\newcommand{\VDQI}{\textit{The Visual Display of Quantitative Information}\xspace}
+\newcommand{\EI}{\textit{Envisioning Information}\xspace}
+\newcommand{\VE}{\textit{Visual Explanations}\xspace}
+\newcommand{\BE}{\textit{Beautiful Evidence}\xspace}
+\newcommand{\TL}{Tufte-\LaTeX\xspace}
+\newcommand{\monthyear}{%
+  \ifcase\month\or January\or February\or March\or April\or May\or June\or
+  July\or August\or September\or October\or November\or
+  December\fi\space\number\year
+}
+\newcommand{\openepigraph}[2]{%
+  \begin{fullwidth}
+  \sffamily\large
+  \begin{doublespace}
+  \noindent\allcaps{#1}\\% epigraph
+  \noindent\allcaps{#2}% author
+  \end{doublespace}
+  \end{fullwidth}
+}
+\newcommand{\blankpage}{\newpage\hbox{}\thispagestyle{empty}\newpage}
+\newcommand{\measure}[3]{#1/#2$\times$\unit[#3]{pc}}
+% ... and so on for all other custom commands like \doccmd, \docenv, etc.
+% For simplicity, assuming all custom commands from TO_modified.tex are here.
+\newcommand{\newthought}[1]{\par\noindent\textsc{#1}} % Simplified example
+
+\makeindex
+
+% --- DOCUMENT BODY ---
+\begin{document}
+
+% --- Front Matter ---
+\frontmatter
+\maketitle
+
+% Copyright Page (optional, can also be in its own subfile)
+\newpage
+\begin{fullwidth}
+~\vfill
+\thispagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
+No copyright \copyright\ \the\year\ \thanklessauthor
+\par\smallcaps{\thanklesspublisher}
+\par\smallcaps{This file contains notes from the literature papers I read throughout my bioinformatics internship, 2025 }
+\par\textit{Last updated \monthyear}
+\end{fullwidth}
+
+% Table of Contents
+\tableofcontents
+
+% --- Main Content ---
+\mainmatter
+
+% Including each chapter from the 'files' subdirectory
+\subfile{files/june11_2025.tex}
+\subfile{files/june12_2025.tex}
+\subfile{files/june13_2025.tex}
+
+% --- Back Matter ---
+\backmatter
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\printindex
+
+\end{document}

@@ -1,0 +1,253 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+\chapter{June $11^{th} / 2025$}
+\label{ch:tufte-design}
+
+\newthought{Evaluation of an automated genome interpretation model for rare disease routinely used in a clinical genetic laboratory} \cite{Meng2023}
+
+\textbf{Variant prioritization:} Process of filtering and ranking a large number of genetic 
+variants identified from sequencing data (i.e., exome/genome) to produce manageable shortlist of plausible candidates that may be responsible for a specific disease for a specific disease of phenotype.
+
+\hrulefill
+
+\textit{Emedgene} aims to reduce bottleneck by automatically generating a shortlist of candidate variants.
+Emedgene was evaluated on $n=180$ retrospective \textit{accuracy} previously solved exome cases and $n=334$ \textit{prospective} production cohort of consecutive clinical cases.
+
+Correlated features with higher rank: Rare familial segregation, known pathogenicity, functional severity.
+
+Accuracy was reduced in some cases due to incomplete genetic data (uncalled copy number variants) or atypical patient phenotypes. The AI-augmented analysis once integrated into workflow, achieved \textit{diagnostic rate $28.7\%$ vs. comparable historical manual rates} but significantly reduced the overall time required for case analysis by enabling a single cycle of review by a geneticist instead of two
+
+\hrulefill
+
+\subsection*{Methods:} 
+\begin{itemize}
+    \item Supervised learning approach, trained on dataset of $10^3$'s of variants that had been manually curated
+    \item Decision tree clustering. It creates model that - based on input - produces score for ranking variants
+    \item \textbf{Features:} Integration of information from multiple sources
+    \begin{itemize}
+        \item \textbf{Variant Level:} Allele freq/count and count of homozygotes in public (e.g., gnomAD) and internal databases
+        \item \textbf{Gene Level:} info about affected gene
+        \item \textbf{Phenotypic Similarity:} Measure of match between patient's reported phenotypes (using Human Phenotype Ontology terms) and phenotypes associated with diseases linked to the variant's gene
+        \item \textbf{family segregation:} Analysis of inheritance patterns (e.g., identifying de \textit{novo} variants or assessing zygosity in context of recessive patterns in x family
+        \item \textbf{Functional Effect:} Predicted impact of variant on protein (e.g., loss-of-function effects like frameshift or nonsense mutations)
+        \item \textbf{Known Pathogenicity:} Variants previously reported as pathogenic or likely pathogenic in databases like ClinVar or internal laboratory databases are given a very high rank
+    \end{itemize}
+
+\hrulefill
+
+\subsection*{Training and evaluation:}
+\begin{itemize}
+    \item \textbf{Training:} Trained on manually curated variants to learn the correlations between the input features and the likelihood of a variant being diagnostic
+    \item \textbf{Validation:} Model's performance was tested using \textbf{CV} on different segments of the data
+    \item \textbf{Performance Metrics:} Sensitivity and specificity evaluate final model on accuracy cohort. sensitivity of $95.3\%$ and a specificity of $99.9\%$ for identifying a variant as a "most likely" candidate
+    \item \textbf{Ranking Accuracy:} Rank of true diagnostic variant in the model's prioritized list of candidates
+\end{itemize}
+\end{itemize}
+
+\textit{Current version does not account for certain types of genetic variation including CNVs, STRs, mitochondrial DNA variants}
+
+\hrulefill
+
+\newthought{Deep learning-based ranking method for subgroup and predictive biomarker identification in patients} \cite{liu2025deep}
+
+Biomarkers associated with treatment effect heterogeneity $=$ Predictive biomarkers. 
+ML $+$ Causal inference for predictive biomarker identification and ITR exploration. 
+
+\textit{To consider}: Meta-learning, Q-learning, D-learning, DNNs for handling \textit{complex biomarker-treatment response relationship}.
+
+\subsection*{DeepRAB} mathematical framework to model \textit{treatment effect heterogeneity} and construct \textit{individualized Treatment Rule (ITR)}. Formulated as \textbf{supervised} ML problem where objective is to predict how much benefit a patient is likely to receive from a treatment based on their specific characteristics (\textbf{biomarkers}).
+
+\textbf{CAE}: Concrete Autoencoder.  RElationship between covariates and disease outcomes instead of relationship between individual treatment effects.
+
+\subsection*{ Modeling relationship: between covariates and disease outcomes}
+
+\textbf{Prognostic model} whose goal is to predict patient's likely outcome based on their baseline characteristics (\textit{covariates}), irrespective of any treatment they may receive.
+
+Let $X = (x_1,x_2,...,x_p)$ be vector of patient's baseline covariates (e.g., genetic biomarkers, age...)
+
+Let $Y$ be disease outcome (e.g., $Y = 1 \rightarrow$ disease progresses) 
+
+\textbf{Goal:} Learn $f$ that models probability of outcome given covariates:
+
+\begin{center}
+    \[
+    f(X) \approx P(Y=1|X)
+    \]
+\end{center}
+
+A \text{standard logistic regression} could model as:
+
+\begin{center}
+    \[
+    \log \left( \frac{P(Y=1|X)}{1 - P(Y=1|X)} \right) = \beta_0 + \sum_{j=1}^{p} \beta_j x_j
+    \]
+\end{center}
+
+CAE would be used for feature selection. In multi dimensional space where $p >>>$, the goal is to identify small but relevant subset of original covariates $X_s \subset X$. Autoencoder learns to reconstruct input features using a \textit{concrete selector} layer that is forced to choose only a few features. FINAL prognostic model is then built using ONLY selected subset:
+
+\begin{center}
+    \[
+    f(X_s) \approx P(Y=1|X_s)
+    \]
+\end{center}
+
+\textit{Output: Model finds prognostic biomarkers} that is features associated with the outcome itself. 
+
+\subsection*{Modeling relationship between individual treatment effects:}
+
+\textbf{Predictive causal model} whose goal is not just to predict outcome, \textit{but to predict} how the outcome \textit{changes} when a patient receives a specific treatment vs. control. (\textbf{Approach used by DeepRAB}).
+
+Consider treatment variable $W$, where $W=1$ for active treatment, $W=0$ for control.
+
+For patient with covariates $X$:
+
+\begin{itemize}
+    \item $Y^1$: Outcome patient will experiences if they received treatment $W =1$
+    \item $Y^0$: Same but for control $W=0$
+\end{itemize}
+
+\textbf{Individual Treatment Effect (ITE)}: $ITE=Y^1 - Y^0$ can only ever observe one for a given patient.
+
+\vspace{0.2cm}
+
+\textbf{Goal} is to learn model that estimates \textbf{CATE} $\tau(x)$
+
+\vspace{0.2cm}
+
+\textbf{DeepRAB} approaches such problem by learning to estimate the outcome under both scenarios. it learns $2$ functions ($2$ heads of $NNs$)
+
+\begin{itemize}
+    \item $\hat{\mu}_1(x) = \mathbb{E}[Y|X=x, W=1]$ (predicted outcome if treated)
+    \item $\hat{\mu}_0(x) = \mathbb{E}[Y|X=x, W=0]$ (predicted outcome if controlled)
+    \item CATE is then estimated as difference between the two predictions:
+    \[
+    \hat{\tau}(x) = \hat{\mu}_1(x) - \hat{\mu}_0(x)
+    \]
+    \item The model is trained to minimize the prediction error on the observed outcomes (e.g., using data from a randomized clinical trial where some patients received treatment and others received control).
+\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%####################%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%####################%%%%%%%%%%%%%%%%%%%%%
+\section{Core Mathematical Concepts:}
+\subsection*{Casual Inference Framework:}
+
+\textbf{Neyman-Rubin potential outcome for causal inference}
+\begin{itemize}
+    \item Let $X_i$ be the vector of baseline biomarkers for patient $i$, $A_i$ be the treatment assignment ($A_i = 1$ for treatment, $A_i = -1$ for control), and $Y_i$ be the observed outcome.
+    \item The model assumes two potential outcomes for each patient: $Y_i(1)$ (outcome if treated) and $Y_i(-1)$ (outcome if on control). We only observe one of these.
+    \item The conditional expectation of the outcome is modeled as:
+    \[
+    \mathbb{E}[Y|A,X] = Z(X)A + H(X) \quad
+    \]
+    where:
+    \begin{itemize}
+        \item $H(X) = \frac{1}{2}[\mathbb{E}[Y|A=1, X] + \mathbb{E}[Y|A=-1, X]]$ represents the \textbf{prognostic effect} of the biomarkers $X$.
+        \item $Z(X) = \frac{1}{2}[\mathbb{E}[Y|A=1, X] - \mathbb{E}[Y|A=-1, X]]$ is the \textbf{contrast function} that reflects the \textbf{heterogeneous treatment effect} given biomarkers $X$. The goal of DeepRAB is to accurately estimate this function $Z(X)$.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{DeepRAB Model Architecture}
+
+Deep Neural Network (DNN) composed of $3$ main components designed to estimate a \textit{personalized benefit score}, $f(x)$, which is a monotonic transformation of the treatment effect function $Z(X)$.
+
+\begin{itemize}
+    \item \textbf{(Component 1) Encoder / Biomarker Selection Layer:} Input layer that performs feature selection using techniques from Concrete Autoencoders (CAE). It learns to select user-specified number $k$ of most informative biomarkers from full set of $p$ input biomarkers. Selection is achieved by learning weight vector $\beta_j^{(0)}$ for each of the $k$ nodes in this layer. The weights are generated using Gumbel-Softmax reparameterization (allows differentiable approximation to sampling from categorical distribution)
+    \begin{itemize}
+        \item Probability of selecting $j$-th biomarker for $i$-th node in this layer:
+        \[
+        \beta_{ij}^{(0)} = \frac{\exp((\log \alpha_i + g_j)/T)}{\sum_{t=1}^{p} \exp((\log \alpha_t + g_t)/T)} \quad
+        \]
+    \end{itemize}
+    \item $\alpha$ and $g$ are learnable parameters, $T$ is temperature parameter that is annealed towards 0 during training. As $T \rightarrow 0$, vector $\beta_j^{(0)}$ becomes a $one-hot$ vector selecting a single biomarker from original input features $x$. Output of layer is $z^{(1)}$ which is vector of $k$ selected biomarkers
+
+    \item \textbf{(Component 2) Decoder / Hidden Layers:} Selected biomarkers $z^{(1)}$ are fed into (standard) Multi-Layer Perceptron (MLP) of $h-1$ hidden layers that model the potentially complex and non-linear relationships between selected biomarkers and treatment effect
+    \begin{itemize}
+        \item Output of each hidden layer $d^{(j)}$:
+        \begin{align*}
+        d^{(1)} &= \phi_1(W^{(1)} z^{(1)} + b^{(1)}) \\
+        d^{(j)} &= \phi_j(W^{(j-1)} d^{(j-1)} + b^{(j-1)}) \quad
+        \end{align*}
+        \item $W$ and $b$ are standard weight matrices and bias vectors, $\phi$ is non-linear activation function
+    \end{itemize}
+
+    \item \textbf{(Component 3) Output Layer and Loss Function:} It produces personalized benefit score $f(x)$. Model is trained by minimizing a specific loss function based on \textbf{A-learning} (Advantage-learning) which is designed to directly estimate optimal Individualized Treatment Rule (ITR) without needing to model prognostic function $H(X)$.
+    \begin{itemize}
+        \item A-learning loss function defined as:
+        \[
+        \mathcal{F}(\theta, x_i, y_i) = \frac{1}{n} \sum_{i=1}^{n} M\{Y_i, (A_i - \pi(x_i))f(x_i), \theta\} \quad 
+        \]
+        \item $\theta$ set all trainable parameters of network
+        \item $\pi(X) = P(A=1|X)$ is propensity score $=$ probability of receiving treatment given covariates $X$. In 1:1 randomized trial $=$ $\pi(X) = 0.5$
+        \item $M(u,v)$ is loss function that depends on outcome type. For continuous, it is squared error loss $M(u,v) = (u-v)^2$; for binary, it is logistic loss $M(u,v) = u \log(1+\exp(-v))$
+    \end{itemize}
+
+\subsection*{Model Training / Evaluation}
+\begin{itemize}
+    \item \textbf{Training:} $\theta$ (including $\alpha$ FS parameters in encoder and $W, b$ in decoder) are optimized by min. A-learning $\mathcal{F}$ (e.g., Adam optimizer)
+    \item \textbf{Hyperparameter Tuning:} $10$-fold CV on training via grid search
+    \item \textbf{Evaluation Metric:} AUC. $\hat{f}(X)$ to rank patients. Vary cutoff of score to generate ROC by comparing predicted vs. true treatment (known in the simulations), then calculate AUC
+\end{itemize}
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%####################%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%####################%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{Biomarker Identification:} One of the key goals of DeepRAB is to facilitate \textbf{predictive biomarker identification}. Thus after training $\rightarrow$ apply form of \textbf{model interpretability} analysis to determine which input features (biomarkers) \textit{most strongly influence} model's prediction of high or low treatment effect $\hat{\tau}(x)$. e.g., methods: 
+\begin{itemize}
+    \item Gradient-based feature attribution 
+    \item Permutation feature importance
+    \item SHAP values
+\end{itemize}
+
+ Performance of mathematical framework is evaluated quantitatively using \textit{simulated} and \textit{real trial data}. Evaluation based on $DeepRAB$'s ability to identify patient subgroups with enhanced treatment responses $\rightarrow$ ranking by $\hat{\tau}(x)$ separates patients who $truly$ benefit from those who do not.
+
+ \subsection*{Mathematical Distinction}
+
+ \textbf{Prognostic Model (Covariates $\rightarrow$ Outcome)}:
+ 'Prognostic' implies info about likely course of disease e.g., disease recurrence, progression, likelihood death. A \textbf{key attribute} of purely prognostic marker is its predictive value is \textit{independent of the specific treatment being administered, that is, biomarker's ability to predict good/bad outcome is present in \textit{both} treated and untreated} 
+
+\begin{itemize}
+    \item $Y$ Outcome of interest (e.g., survival time, disease progression score) 
+    \item $X$ Biomarker measurement (e.g., gene expression level, $T_1$ time)
+    \item $W$ Binary treatment indicator
+\end{itemize}
+     
+ \begin{center}
+     \[
+    \mathbb{E}[Y|X,W] = \beta_0 + \beta_x X + \beta_w W + \beta_{xw}(X \cdot W)
+    \]
+ \end{center}
+
+\textit{Conditions}:
+
+\begin{enumerate}
+    \item Must be associated with outcome: Coefficient for biomarker itself must be significant
+    \[
+    \beta_X \neq 0
+    \]
+    $X$ provides information about $Y$ even when $W=0$
+    \item Effect must NOT depend on treatment: No significant interaction between biomarker and treatment
+    \[
+    \beta_{XW} = 0
+    \]
+    Effect of $X$ on $Y$ is same for both $W=1$ and $W=0$. Graphically, the lines representing the relationship between $X$ and $Y$ for the treated and control groups are \textbf{parallel}. Here, treatment effect $\beta_W$ is constant $\forall x_i \in X$
+\end{enumerate}
+
+ \begin{itemize}
+     \item Models $P(Y|X)$
+     \item \textit{'Given x patient's biomarker, what is their likely prognosis?'}
+     \item Biomarkers found: Prognostic. Such features predict outcome regardless of treatment
+ \end{itemize}
+
+
+ \textbf{Predictive Model of Treatment Effect (Covariates $\rightarrow$ Treatment Effect):} 
+ \begin{itemize}
+     \item Models $\mathbb{E}[Y^{(1)}-Y^{(0)}|X=x]$
+     \item \textit{'Given patient's biomarkers, how much benefit will they get from $treatment$ vs. $control$?'}
+     \item Biomarkers found: Predictive. Outcome prediction $\And$ Prediction of response difference to treatment. e.g., X biomarker might not have relationship with  outcome in control but a strong relationship in treated
+ \end{itemize}
+\subsection*{Summary} Subgroup identification and modeling treatment effect heterogeneity with predictive biomarker identification (feature selection method) being key component and outcome of process. 
+ 
+\end{document}
