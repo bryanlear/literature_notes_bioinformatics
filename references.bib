@@ -74,4 +74,32 @@ abstract = {The vast majority of missense variants observed in the human genome 
 }
 
 
+@article{10.1093/bioinformatics/btad541,
+    author = {Tan, Wuwei and Shen, Yang},
+    title = {Multimodal learning of noncoding variant effects using genome sequence and chromatin structure},
+    journal = {Bioinformatics},
+    volume = {39},
+    number = {9},
+    pages = {btad541},
+    year = {2023},
+    month = {09},
+    abstract = {A growing amount of noncoding genetic variants, including single-nucleotide polymorphisms, are found to be associated with complex human traits and diseases. Their mechanistic interpretation is relatively limited and can use the help from computational prediction of their effects on epigenetic profiles. However, current models often focus on local, 1D genome sequence determinants and disregard global, 3D chromatin structure that critically affects epigenetic events.We find that noncoding variants of unexpected high similarity in epigenetic profiles, with regards to their relatively low similarity in local sequences, can be largely attributed to their proximity in chromatin structure. Accordingly, we have developed a multimodal deep learning scheme that incorporates both data of 1D genome sequence and 3D chromatin structure for predicting noncoding variant effects. Specifically, we have integrated convolutional and recurrent neural networks for sequence embedding and graph neural networks for structure embedding despite the resolution gap between the two types of data, while utilizing recent DNA language models. Numerical results show that our models outperform competing sequence-only models in predicting epigenetic profiles and their use of long-range interactions complement sequence-only models in extracting regulatory motifs. They prove to be excellent predictors for noncoding variant effects in gene expression and pathogenicity, whether in unsupervised “zero-shot” learning or supervised “few-shot” learning.Codes and data can be accessed at https://github.com/Shen-Lab/ncVarPred-1D3D and https://zenodo.org/record/7975777.},
+    issn = {1367-4811},
+    doi = {10.1093/bioinformatics/btad541},
+    url = {https://doi.org/10.1093/bioinformatics/btad541},
+    eprint = {https://academic.oup.com/bioinformatics/article-pdf/39/9/btad541/51556142/btad541.pdf},
+}
 
+
+@article{Richards2015,
+  author={Richards, S and Aziz, N and Bale, S and Bick, D and Das, S and Gastier-Foster, J and Grody, W W and Hegde, M and Lyon, E and Spector, E and Voelkerding, K and Rehm, H L and ACMG Laboratory Quality Assurance Committee},
+  title={Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology},
+  journal={Genetics in Medicine},
+  year={2015},
+  volume={17},
+  number={5},
+  pages={405--424},
+  doi={10.1038/gim.2015.30},
+  pmid={25741868},
+  pmcid={PMC4544753}
+}

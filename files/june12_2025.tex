@@ -25,10 +25,11 @@ Computational tools whose primary function is to assess potential functional imp
 \hrulefill
 
 \newthought{Accurate proteome-wide missense variant effect prediction with AlphaMissense}\cite{doi:10.1126/science.adg7492} \cite{Jumper2021}
+
+\hrulefill
+
 \section*{$\alpha$-Missense} 
 By Google DeepMind. It predicts pathogenicity of missense variants. Architectures is inspired by $Evoformer$ block used in $\alpha$-fold 
-
-\vspace{0.3cm}
 
 \textit{\textbf{Core}} idea is to iteratively refine $2$ key representations:
 \begin{itemize}
@@ -50,7 +51,6 @@ By Google DeepMind. It predicts pathogenicity of missense variants. Architecture
 
 Tensor $\mathrm{P}$ of dimensions $\mathrm{L} * \mathrm{L} * \mathrm{d_{pair}}$ where $\mathrm{L}$ length protein sequence and $\mathrm{d_{pair}}$ is $\#$ features the model stores for each pair. \textit{Just like L x L matrix but instead of scalar in ij, a high dimensional vector of features describing relationship between ij}
 
-\hrulefill
 
 \subsection*{Evoformer Block}
 The model consists of series of stacked Evoformer blocks. Each block takes $\mathrm{M}$ and $\mathrm{P}$ and outputs updated $\mathrm{M'}$ and $\mathrm{P'}$. Info is allowed to flow back and forth between MSA (evolutionary context) and implicit structural context (pair representation)
@@ -108,7 +108,6 @@ $\mathrm{M_{:,1}}$ is AA at \textbf{residue position} $i$ across all the differe
 
 \textit{\large{Pair Representation Update:}} Tensor $P$ undergoes own refinement using series of convolutional layers or axial attention layers or axial attention layers applied over $L*L$ grid. Analogous to refining distance so model is allowed to enforce geometric consistency rules like e.g.,triangle inequality, on the relationship between residues. $P'$ is fed back into MSA update in the next Evoformer block.
 
-\hrulefill
 
 \subsection*{Prediction Head and Pathogenicity Score}
 To make a prediction for a $x$ missense variant  (e.g., wiild type AA $a_{wt}$ at $i$ is replaced by $a_{mut}$ a prediction head is used.
@@ -137,6 +136,8 @@ $\alpha$ is final pathogenicity score
 \hrulefill
 
 \newthought{SIFT: predicting amino acid changes that affect protein function} \cite{Ng2003SIFT}
+
+\hrulefill
 
 \section{SIFT Algorithm}
 

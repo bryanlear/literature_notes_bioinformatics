@@ -1,0 +1,45 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+\chapter{June $15^{th} / 2025$}
+\label{ch:tufte-design}
+
+$\blacktriangleright$ ACMG/AMP provides standardized system for variant classification but it is \textbf{not} a rigid algorithm. THe guidelines are built with flexibility and state that expert judgement is required.
+
+\vspace{0.3cm}
+
+$\blacktriangleright$ Exceptions to guidelines may be cases where context, gene-specific knowledge, whether quality of evidence allows a rule to be applied differently or not.
+
+\vspace{0.3cm}
+
+\subsection{Guidelines instead of rigid point-based system}
+
+Authors state:
+\begin{quote}
+    'that the assignment of specific points for each criterion implied a level of quantitative understanding...that is currently not supported scientifically and does not take into account the complexity of interpreting genetic evidence'
+\end{quote}   
+
+Entire framework is thus built on the premise of \textit{allowing expert curation and judgement} to upgrade/downgrade/ignore $x$ piece of evidence based on context.
+
+\subsection{Exceptions and Context-Dependent Rule \cite{Richards2015}} 
+
+\begin{itemize}[leftmargin=*, itemsep=2pt]
+    \item \textbf{Context-Dependent Evidence Strength:} The weight of several criteria can be adjusted based on the available data. For example:
+    \begin{itemize}
+        \item The evidence for a variant co-segregating with disease in a family (\textbf{PP1}) can be upgraded from `Supporting` to `Moderate` or `Strong` if data from multiple large families is available
+        \item Observing a variant \textit{in trans} with a known pathogenic variant for a recessive disorder (\textbf{PM3}) can be upgraded from `Moderate` to `Strong` if this is observed multiple times
+    \end{itemize}
+
+    \item \textbf{Gene-Specific Disease Mechanisms:} The applicability of certain rules depends entirely on the known biology of the gene in question.
+    \begin{itemize}
+        \item The \textbf{PVS1} (predicted null variant) criterion is considered `Very Strong` pathogenic evidence, but only for genes where loss-of-function is a known disease mechanism. For many cardiovascular genes like \textit{MYH7}, where missense variants are the primary cause of disease, a heterozygous null variant is not pathogenic, and PVS1 does not apply
+    \end{itemize}
+    
+    \item \textbf{Evolving Guidelines:} The framework is intended to evolve as new data becomes available.
+    \begin{itemize}
+        \item The **PM2** criterion (variant is absent from controls in population databases) was originally weighted as `Moderate`. However, subsequent analysis by the ClinGen consortium recommended downgrading its strength to `Supporting` on its own, acknowledging that most very rare or novel variants are benign 
+    \end{itemize}
+\end{itemize}
+
+\end{document}

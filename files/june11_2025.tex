@@ -7,10 +7,10 @@
 
 \newthought{Evaluation of an automated genome interpretation model for rare disease routinely used in a clinical genetic laboratory} \cite{Meng2023}
 
+\hrulefill
+
 \textbf{Variant prioritization:} Process of filtering and ranking a large number of genetic 
 variants identified from sequencing data (i.e., exome/genome) to produce manageable shortlist of plausible candidates that may be responsible for a specific disease for a specific disease of phenotype.
-
-\hrulefill
 
 \textit{Emedgene} aims to reduce bottleneck by automatically generating a shortlist of candidate variants.
 Emedgene was evaluated on $n=180$ retrospective \textit{accuracy} previously solved exome cases and $n=334$ \textit{prospective} production cohort of consecutive clinical cases.
@@ -18,8 +18,6 @@ Emedgene was evaluated on $n=180$ retrospective \textit{accuracy} previously sol
 Correlated features with higher rank: Rare familial segregation, known pathogenicity, functional severity.
 
 Accuracy was reduced in some cases due to incomplete genetic data (uncalled copy number variants) or atypical patient phenotypes. The AI-augmented analysis once integrated into workflow, achieved \textit{diagnostic rate $28.7\%$ vs. comparable historical manual rates} but significantly reduced the overall time required for case analysis by enabling a single cycle of review by a geneticist instead of two
-
-\hrulefill
 
 \subsection*{Methods:} 
 \begin{itemize}
@@ -35,8 +33,6 @@ Accuracy was reduced in some cases due to incomplete genetic data (uncalled copy
         \item \textbf{Known Pathogenicity:} Variants previously reported as pathogenic or likely pathogenic in databases like ClinVar or internal laboratory databases are given a very high rank
     \end{itemize}
 
-\hrulefill
-
 \subsection*{Training and evaluation:}
 \begin{itemize}
     \item \textbf{Training:} Trained on manually curated variants to learn the correlations between the input features and the likelihood of a variant being diagnostic
@@ -51,6 +47,8 @@ Accuracy was reduced in some cases due to incomplete genetic data (uncalled copy
 \hrulefill
 
 \newthought{Deep learning-based ranking method for subgroup and predictive biomarker identification in patients} \cite{liu2025deep}
+
+\hrulefill
 
 Biomarkers associated with treatment effect heterogeneity $=$ Predictive biomarkers. 
 ML $+$ Causal inference for predictive biomarker identification and ITR exploration. 
@@ -240,7 +238,6 @@ Deep Neural Network (DNN) composed of $3$ main components designed to estimate a
      \item \textit{'Given x patient's biomarker, what is their likely prognosis?'}
      \item Biomarkers found: Prognostic. Such features predict outcome regardless of treatment
  \end{itemize}
-
 
  \textbf{Predictive Model of Treatment Effect (Covariates $\rightarrow$ Treatment Effect):} 
  \begin{itemize}
