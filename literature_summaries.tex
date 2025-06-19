@@ -1,0 +1,1031 @@
+\documentclass[twocolumn]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+\usepackage{natbib}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usepackage{textcomp} % Useful for symbols like \textdegree
+\usepackage{hyperref}
+% Define a new tcolorbox environment for literature papers
+\newtcolorbox{literaturepaper}[1]{ % #1 is for the title
+    enhanced,
+    breakable, % Allows the box to break across pages/columns
+    colback=gray!5,
+    colframe=black!20,
+    boxsep=5pt,
+    arc=4pt,
+    title={#1}, % Title is the mandatory argument
+    fonttitle=\bfseries,
+    coltitle=blue!70!black,
+    span=all, % Makes the box span all columns
+    parbox=false, % Allows paragraphs to break correctly within the box
+    before skip=1em,
+    after skip=1em,
+    left skip=0pt,
+    right skip=0pt
+    % 'growboxset' was removed as it's not a standard tcolorbox key;
+    % height is usually managed automatically by 'breakable' and content.
+}
+
+% A new tcolorbox for small highlighted blocks (display style)
+\newtcolorbox{smallhighlightbox}[1][]{
+    enhanced,
+    colback=blue!5!white,
+    colframe=blue!20!white,
+    boxsep=2pt,
+    arc=2pt,
+    boxrule=0.5pt,
+    #1
+}
+
+\bibliographystyle{plainnat} % Or another style like abbrvnat, unsrtnat
+
+\begin{document}
+
+\section*{Literature Summaries}
+\vspace{0em}
+    \large\textit{Summaries compiled by \textbf{Bryan L.A.}, Amsterdam, NL. 2025.}
+\vspace{1em}
+
+% First literature summary box
+\begin{literaturepaper}{Bayesian Graphical Models for Integrating Multiplatform Genomics Data \cite{Wang_Baladandayuthapani_Holmes_Do_2013}}
+\label{paper-summary-1}
+\small
+    \textbf{Aim:} Graphical model frameworks to integrate multiplatform genomic data (gene expression and microRNA expression) with clinical data (patient survival) to identify and characterize meaningful biological relationships. Model selection problem: For each triplet, select best-fitting graph from $K_i$ (determine type of dependence structure). Focus on identifying mRNA and genes whose relationship align with biologically plausible processes.
+
+    \textbf{G} = Gene expression, \textbf{M} = MicroRNA expression, \textbf{C} = Clinical outcome
+    
+    \begin{itemize}[label=$\circ$]
+        \item Undirected graphs where each node is either $G, M, C$.
+        \item Let $V = \{G,M,C\}$ be set of nodes (variables) in graphs.
+        \item Each of the 8 models represented as undirected graphs $K_i$ (for $i = 0,...,7$).
+        \item $K_i = (V, E_i)$, where an edge $(u, v) \in E_i$ signifies Conditional Dependence (direct statistical association) between $u$ and $v$.
+        \item Absence of $(u, v)$ means nodes are conditionally independent given a 3rd variable.
+    \end{itemize}
+
+    \textbf{Statistical framework:} Bayesian model selection approach for Gaussian graphical models (GGMs) to select most appropriate $K_i$ for each $V$. Bayesian GGM has closed-form expression $\to$ reduced computational time/cost.
+
+    Whereas molecular features at DNA level only modulate mRNA expression of corresponding (nearby) genes, microRNA can regulate mRNA expression of any genes regardless of locus (also multiple target capability). Relationship between microRNA and targets depends ONLY on inherent features (such as sequence and structure of microRNA).
+
+    \textbf{GGM:} For measuring dependency structure for multivariate normal distributions.
+
+    Let $X = (x_1,...,x_p)'$ be a $p$-dimensional normal random vector with mean $\mu$ and covariance matrix $\Sigma$.
+    Each observation $x \sim N(0, \Sigma)$, with unknown $\Sigma$.
+    
+    \textbf{\textit{Inverse covariance matrix}} (Precision matrix/Concentration matrix) $\Omega = \Sigma^{-1}$ reveals \textbf{\textit{conditional dependence structure}}. $\Omega$ has elements $\omega_{ij}$.
+    An off-diagonal element $\omega_{ij} = 0$ (for $i \neq j$) if and only if variables $x_i$ and $x_j$ are \textbf{conditionally independent} given all other variables in the set.
+    Partial correlation: $\rho_{ij \cdot \text{rest}} = -\omega_{ij} / \sqrt{\omega_{ii}\omega_{jj}}$.
+
+    When \textbf{off-diagonal elements} $\omega_{ij} = 0$ (for $i \neq j$), this implies NO EDGE, meaning no direct relationship (after accounting for the influence of all other variables $X_{V \setminus \{i,j\}}$).
+
+    Partial correlation thus measures \textit{direct linear association} between 2 variables AFTER adjusting/removing for linear effects of all other variables in the model, helping to distinguish \textbf{direct} from \textbf{indirect} relationships.
+
+    \textbf{Conditional variance of $x_i$:} is $1/\omega_{ii}$ (assuming $\Omega$ is the precision matrix of the conditional distribution). Increasing $\omega_{ii}$ means decreasing conditional variance (higher precision).
+
+    \textbf{Multivariate Normal Density Function:} $\Omega$ appears in the exponent:
+    \[f(X) \propto \exp\left(-\frac{1}{2}(X-\mu)'\Omega(X-\mu)\right)\]
+    The term $(X-\mu)'\Omega(X-\mu)$ is a quadratic form defining the \textbf{Mahalanobis distance} (\textit{measures distance between a point and a distribution, accounting for covariance}). Here, $\Omega$ determines the shape of the distribution.
+
+    \textbf{Geometrical meaning:} Surfaces of constant probability density are \textit{ellipsoids} (isoprobability contours). Their shape, orientation, and tightness are determined by $\Sigma$ (and thus $\Omega$).
+
+    $\Omega$ is \textbf{diagonal} $\rightarrow$ all \textbf{off-diagonal elements} $\omega_{ij} = 0$ (for $i \neq j$), while \textbf{diagonal elements} $\omega_{ii}$ can be non-zero.
+
+    \textbf{Decomposable Graph:} $G = (V,E)$ if either G is complete or $V = A \cup S \cup B$, where $S$ is \textbf{complete} and separates $A$ and $B$, and both $A \cup S$ and $B \cup S$ are decomposable graphs. (All 8 models in the chapter are stated to be decomposable).
+
+    Posterior probability of graph $G$:
+    \[p(G|X) \propto p(G) \int p(X|\Sigma, G) p(\Sigma|G) d\Sigma,\]
+    where $p(G)$ is the prior for graph $G$, and $p(\Sigma|G)$ is the prior for covariance matrix $\Sigma$ given $G$.
+
+    \textbf{Prior Choice:} The integral is sensitive to the choice of prior $p(\Sigma|G)$.
+    \textbf{Hyper-inverse Wishart (HIW) distribution:} A conjugate prior, $p(\Sigma|G) \sim \text{HIW}_G(b, D)$, where $b$ is for degrees of freedom and $D$ is a scale matrix.
+    
+    \textbf{Fractional Bayes Factors:} Used when prior information is weak. Notionally uses a small fraction $(g)$ of the data (likelihood) to "train" a noninformative prior into a proper one.
+    The HIW g-prior, $p(\Sigma|G) \sim \text{HIW}_G(g \cdot n, gX'X)$, corresponds to this fractional Bayes factor approach, addressing the "double use of data" concern from $X'X$ in the prior.
+
+    \textbf{Bayes Factor $BF(G_0 : G_i)$ for comparing null graph $G_0$ (no edges) to an alternative $G_i$:}
+    (\textit{Your transcribed formula. Note: The product terms over cliques $\mathcal{C}$ and separators $\mathcal{S}$ in your transcription of $F_i$ are identical in the numerator and denominator and would cancel out. Please verify if this is the intended formula. The formula in `4.pdf` (Equation 14.2) is different.})
+
+    Let the Bayes Factor be $BF(G_0 : G_i) = M \times F_i$, where $F_i$ is the main fraction:
+    \[ F_i = \frac{\prod_{j=1}^p \left|\frac{1}{2}X_j'X_j\right|^{\frac{n}{2}} \prod_{C \in \mathcal{C}} \left|\frac{1}{2}X_C'X_C\right|^{\frac{|C|}{2}}\prod_{S \in \mathcal{S}} \left|\frac{1}{2}X_S'X_S\right|^{\frac{|S|}{2}}}{\prod_{j=1}^p \left|\frac{1}{2n}X_j'X_j\right|^{\frac{1}{2}} \prod_{S \in \mathcal{S}} \left|\frac{1}{2}X_S'X_S\right|^{\frac{|S|}{2}} \prod_{C \in \mathcal{C}} \left|\frac{1}{2}X_C'X_C\right|^{\frac{|C|}{2}}} \]
+    And $M$ is:
+    \[ M = \frac{\prod_{C \in \mathcal{C}} \Gamma\left(\frac{n+|C|-1}{2}\right) \prod_{S \in \mathcal{S}} \Gamma\left(\frac{|S|}{2}\right)}{\prod_{S \in \mathcal{S}} \Gamma\left(\frac{n+|S|-1}{2}\right)\prod_{C \in \mathcal{C}} \Gamma\left(\frac{|C|}{2}\right)} \]
+
+    \textbf{Example of $\Omega$ matrices:}
+    General $\Omega$:
+    \[ \Omega = \begin{pmatrix} \omega_{11} & \omega_{12} & \omega_{13} \\ \omega_{21} & \omega_{22} & \omega_{23} \\ \omega_{31} & \omega_{32} & \omega_{33} \end{pmatrix} \]
+    Diagonal $\Omega$:
+    \[ \Omega_{\text{diagonal}} = \begin{pmatrix} \omega_{11} & 0 & 0 \\ 0 & \omega_{22} & 0 \\ 0 & 0 & \omega_{33} \end{pmatrix} \]
+
+    \textbf{Preprocessing step for clinical outcome C (in GGM context):} Use Cox model and Breslow estimator to handle censored survival data and derive a transformed (e.g., imputed, log-transformed) clinical outcome variable 'C' suitable for the GGM framework.
+\end{literaturepaper} % Correct placement for the end of the first paper's box
+
+% Second literature summary box
+\begin{literaturepaper}{SVNN: an efficient PacBio-specific pipeline for structural variations calling using neural networks \cite{Akbarinejad2021}}
+\label{paper-summary-2}
+\small
+    \textbf{Aim:} Structural Variations (SV) - insertion/deletion/translocation/inversion $> 50\text{bp}$ - significant contributors to human disease and phenotypic traits. While long sequencing reads are better for detecting large SVs, they suffer from high sequencing error rates (up to $15\%$). Therefore, high-coverage data is needed for accurate SV detection, making the alignment phase (prerequisite for SV calling) extremely time-consuming and costly. Long-read SV analyses often deal with low-coverage data. There is a need for an efficient SV calling pipeline.
+
+    \textbf{Proposed solution:} SVNN, a fast and accurate PacBio-specific pipeline for calling SVs $> 50\text{bp}$ from raw long-reads. Aims for high sensitivity and precision even in low-coverage settings while being faster than naive combinations of state-of-the-art tools.
+
+    \textit{SVNN combines existing tools using a Neural Network (NN) to optimize speed and accuracy. It leverages fast aligners for initial processing and more accurate (albeit slower) aligners only for a crucial subset of reads identified by the NN.}
+
+    \textbf{Stages/Modules}
+    \begin{itemize}
+        \item \textbf{Map with Minimap2:} All raw input reads are mapped to reference genome using Minimap2 (fast long-read aligner).
+        \item \textbf{Find Informative Reads (NN):}
+        \begin{itemize}
+            \item Features are extracted from the SAM file output (from module 1) for each read.
+            \item Pre-trained NN classifies reads into 2 categories:
+            \begin{itemize}
+                \item \textbf{Informative reads:} Reads not split by Minimap2 but likely to be split by more sensitive (slower) aligner NGMLR. Crucial for detecting SVs that Minimap2 may miss or misrepresent.
+                \item \textbf{Other reads}
+            \end{itemize}
+            \item Only a small fraction (e.g., $0.7\%$) split by NGMLR are useful for SV detection. NN tries to identify a superset of such useful reads efficiently.   
+        \end{itemize} 
+        \item \textbf{Map with NGMLR:}
+        \begin{itemize}
+            \item ONLY informative reads identified by NN + reads split by Minimap2 are re-aligned using NGMLR. It provides alignments more suitable for downstream SV calling. Targeted use of NGMLR reduces computational burden drastically.
+        \end{itemize}
+        \item \textbf{Unify Minimap2 and NGMLR outputs:} SAM outputs from Minimap2 (bulk of reads) and NGMLR (selected subset) are processed to ensure consistent SAM tags, combined, sorted, and converted to BAM using samtools. May introduce redundancy if a read is processed by both aligners and supports the same SV.
+        \item \textbf{Detect SVs by SVIM and Sniffles:} Combined BAM is fed separately to SV callers, SVIM and Sniffles. Using both callers increases sensitivity. May also create redundancy if both tools call the same SV.
+        \item \textbf{Filter Redundant SVs:} Final filter step to resolve redundancies.
+        \begin{itemize}
+            \item For reads processed by both aligners supporting the same SV, unique supporting reads are counted to ensure minimum threshold is met. 
+            \item SVs of the same type called by both Sniffles and SVIM with breakpoint differences $< 50 \text{bp}$ are unified, with the call supported by more reads being selected. (Corrected from `> 50 bps`)
+        \end{itemize}
+    \end{itemize}
+
+    \textbf{NN Details:}
+    \begin{itemize}
+        \item \textbf{Architecture:} Fully-connected feedforward NN with 5 hidden layers (18, 30, 18, 11, 5 neurons) using $\tanh$ activation function.
+        \item \textbf{Features:} Extracted from Minimap2's SAM output, including SAM tags (chaining scores s1, s2; number of minimizers (cm); mismatches/gaps (NM); alignment score (AS)) and custom-extracted features designed to capture alignment noise (total insertions/deletions/mismatches in $100\text{bp}$ bins across the read; read length). Features are location-independent.
+        \item \textbf{Training:} Trained on simulated PacBio-like reads. Reads labeled $1 = \text{informative}$ if not split by Minimap2 but split by NGMLR; $0 = \text{otherwise}$. Reads split by Minimap2 excluded from this NN training set. 
+    \end{itemize}
+
+    SVNN was compared against 3 other pipelines. Performance measured by sensitivity (recall) and False Discovery Rate (FDR).
+    SVNN combines speed of Minimap2 and accuracy of NGMLR (plus SVIM and Sniffles) $\rightarrow$ fast and sensitive SV detection pipeline for PacBio reads, especially in low-coverage situations.
+
+    \textbf{Mathematical Framework: NN}. Serves as a binary classifier to identify "informative reads." These are reads not split by Minimap2 but likely to be split by NGMLR, potentially containing evidence for SVs that Minimap2 might obscure. The pipeline saves time by sending only this enriched subset (plus reads already split by Minimap2) to the slower NGMLR.
+    \begin{itemize}
+        \item \textbf{Input Features (examples from paper):} Chaining score (s1), chaining score of best secondary chain (s2), number of minimizers on chain (cm), total mismatches/gaps (NM), alignment score (AS), \textbf{custom features:} 
+        \begin{itemize}
+            \item total number of insertions
+            \item total number of deletions
+            \item number of mismatches
+            \item longest run of deletions/insertions/mismatches
+            \item longest run of deletions/insertions/mismatches with one match in between
+            \item length of soft-clipped segments at both ends
+            \item counts of indels/mismatches in the four 100bp bins with the most events
+            \item read length
+        \end{itemize}
+        Output layer (typically one neuron with sigmoid function) produces a probability score for a read being "informative."
+
+        \textbf{\textit{Training Labeling: A read was labeled "informative" (target = 1) if it was not split by Minimap2 but was split by NGMLR. Other reads (not split by Minimap2 and not split by NGMLR) were labeled with target = 0. (Reads already split by Minimap2 were handled separately).}}
+    \end{itemize}
+\end{literaturepaper} 
+
+\begin{literaturepaper}{Background Information}
+\label{background-info}
+\small
+\textbf{Classification system:} Variants typically defined into:
+\begin{itemize}
+    \item Pathogenic
+    \item Likely Pathogenic
+    \item \textbf{Variant of Uncertain Significance (VUS)}
+    \item Likely Benign
+    \item Benign
+\end{itemize}
+A VUS is a variant for which there is insufficient or conflicting evidence to definitively classify it as either pathogenic or benign at the current time. More research or data is needed to clarify its role. \textit{Limited evidence for variants not observed in population databases can lead to an increased number of variants of uncertain significance in clinical genetic testing.} Thus, VUS describes current interpretation of a variant's effect on health.
+
+
+
+
+\textbf{Adjacency Matrix:} A, square matrix to represent a finite graph. If graph has $N$ nodes, its A will be $N * N$ matrix.
+
+\section*{Adjacency Matrix}
+
+An \textbf{adjacency matrix} $A$ of a graph $G = (V, E)$ with $N$ nodes, where $V = \{v_1, v_2, \ldots, v_N\}$ is the set of vertices and $E$ is the set of edges, is an $N \times N$ square matrix where its elements $A_{ij}$ are defined as follows:
+
+
+For an \textbf{unweighted graph}:
+$$
+A_{ij} = \begin{cases}
+1 & \text{if edge between node } i \text{ and node } j \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+For a \textbf{weighted graph}:
+$$
+A_{ij} = \begin{cases}
+w_{ij} & \text{if edge between nodes } \text{ with weight } w_{ij} \\
+0 & \text{otherwise}*
+\end{cases}
+$$
+
+* $(\text{or sometimes } \infty \text{ depending on convention})$
+
+\subsection*{Properties:}
+
+\begin{itemize}
+    \item For an \textbf{undirected graph}, the adjacency matrix is symmetric: $A_{ij} = A_{ji}$ for all $i, j \in \{1, \ldots, N\}$.
+
+    \item In GCN, a modified adjacency matrix $\tilde{A}$ is often used, where self-loops are added to each node. This means diagonal elements of standard adjacency matrix $A$ are set to 1:
+    $$
+    \tilde{A}_{ii} = 1 \quad \text{for all } i \in \{1, \ldots, N\}
+    $$
+    and for $i \neq j$, $\tilde{A}_{ij} = A_{ij}$. This can also be expressed as $\tilde{A} = A + I$, where $I$ is the identity matrix.
+\end{itemize}
+
+\end{literaturepaper} 
+
+\begin{literaturepaper}{Next-Generation Sequencing \cite{gencore_how_sequencing_works}}
+\label{paper-summary-ngs} % Changed label to be more unique
+\small
+\begin{itemize}
+    \item \textbf{Read:} Single sequence produced from a sequencer.
+    \item \textbf{Library:} Collection of DNA fragments that have been prepared for sequencing. 
+    \item \textbf{Flowcell:} Chip on which DNA is loaded and provided to the sequencer.
+    \item \textbf{Lane:} Open portion of a flowcell. Usually for technical replicates or different samples.
+    \item \textbf{Run:} Entire sequencing reaction from start to finish.
+\end{itemize}
+
+\textbf{Steps:}
+\begin{enumerate}
+    \item Sample collection/preparation
+    \item Amplification 
+    \item Basecalling 
+\end{enumerate}
+
+\begin{center} % Centering the TikZ picture
+\begin{tikzpicture}[
+    every node/.style={draw, circle, fill=blue!20, minimum size=1cm, inner sep=1pt}, % Adjusted minimum size for better text fit
+    grandchildnode/.style={draw, rectangle, fill=green!20, text width=3cm, align=center, minimum height=1.5cm}, % Centered text in grandchild
+    level 1/.style={sibling distance=4cm, level distance=2.5cm}, % Distance for first level children
+    level 2/.style={sibling distance=2cm, level distance=3.5cm}  % Distance for grandchildren
+]
+\node {Sequencing}
+    child {node {Single-Read}
+        child {node[grandchildnode] {
+            - Simple library prep \\
+            - Low input DNA \\
+            - Economical
+        }} 
+    } 
+    child {node {Paired-End}
+        child {node[grandchildnode] {
+            - Simple paired-end libraries \\
+            - Efficient sample use \\
+            - Broad range applications
+        }}
+    }; % Semicolon terminates the \node command
+\end{tikzpicture}
+\end{center}
+
+\textbf{FastA Format:} Most basic for reporting a sequence. Contains sequence name, description. 
+\begin{verbatim}
+>Chr1 CHROMOSOME dumped from ADB: 
+Jun/20/09 14:53; last updated: 2009-02-02
+CCCTAAACCCTAAACCCTAAACCCTAAACCTC
+TGAATCCTTAATCCCTAAATCCCTAAATCTTT
+AAATCCTACATCCAT
+\end{verbatim}
+\textit{DB query tools} such as \textbf{blast} and \textbf{multiple-sequence alignment} programs accept only FastA. Reference Genomes are often delivered in this format.
+
+\textbf{FastQ Format:} Most widely used in sequence analysis. Output delivered from a sequencer. More information is contained in this format.
+\begin{verbatim}
+@SEQ_ID
+GATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAATCCAT
+TTGTTCAACTCACAGTTT
++
+!''*((((***+))%%%++)(%%%%).1***-+*''))**5
+5CCF>>>>>>CCCCCCC65
+\end{verbatim}
+\textit{Quality value characters. Lowest: \texttt{!} and highest: \texttt{\textasciitilde{}}}:
+\begin{verbatim}
+!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMN
+OPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuv
+wxyz{|}~
+\end{verbatim}
+
+\begin{itemize}
+    \item Sequence Header:
+    \begin{itemize}
+        \item \texttt{@} is sequence identifier
+        \item rest is sequence description
+    \end{itemize}
+    \item Second line is sequence
+    \item Third line starts with \texttt{+} and can have same sequence identifier appended
+    \item Fourth are quality scores (ASCII encoded)
+\end{itemize}
+Sequence Header contains: Instrument name, run ID, flowcell ID, flowcell lane, tile number, X and Y coordinates of cluster, member of a pair, filtered status, control bits, index sequence, etc.
+
+Nearly everything works with FastQ except for: Blast, Multiple sequence alignment (typically require FastA), any reference sequence (usually FastA).
+
+\textbf{Quality Scores/Q-score:} Integer value assigned to each nucleotide base. Represents estimated probability ($P$) that base call is incorrect. Logarithmic scale: $Q = -10\log_{10}(P)$.
+\textbf{Higher Q-score} = Higher confidence = lower $P$ (error) = higher accuracy.
+\textbf{Lower Q-score} = Lower confidence = higher $P$ (error).
+
+\textbf{Examples:}
+\begin{itemize}
+    \item \textbf{Q10:} $P=0.1$ (1 in 10 error). Accuracy = $90\%$.
+    \item \textbf{Q20:} $P=0.01$ (1 in 100 error). Accuracy = $99\%$. Often a minimum acceptable quality.
+    \item \textbf{Q30:} $P=0.001$ (1 in 1,000 error). Accuracy = $99.9\%$. Benchmark for high-quality.
+    \item \textbf{Q40:} $P=0.0001$ (1 in 10,000 error). Accuracy = $99.99\%$.
+\end{itemize}
+
+Common uses: filter bases/reads if a threshold is not met.
+Main purpose: provide evidence that the sequence, alignment, assembly, SNP are real and not sequencing artifacts.
+
+\textbf{SAM Format:} Sequence Alignment/Map. Basic, human-readable text format. Generated by most alignment algorithms. Consists of:
+\begin{itemize}
+    \item \textbf{Header section (optional):} Lines start with \texttt{@}. Contains metadata: SAM format version (\texttt{@HD}), reference sequence dictionary (\texttt{@SQ}), read groups (\texttt{@RG}), program used (\texttt{@PG}), comments (\texttt{@CO})
+
+    \item \textbf{Alignment section:} Each line is an alignment record for a single read. Contains 11 mandatory fields, followed by optional fields. \\
+
+    \textbf{Field Descriptions:}
+
+    \begin{enumerate}
+        \item QNAME: Query template NAME
+        \item FLAG: bitwise FLAG
+        \item RNAME: Reference sequence NAME
+        \item POS: 1-based leftmost mapping POSition
+        \item MAPQ: MAPping Quality
+        \item CIGAR: CIGAR string
+        \item RNEXT: Ref. name of the mate/next read
+        \item PNEXT: Position of the mate/next read
+        \item TLEN: observed Template LENgth
+        \item SEQ: segment SEQuence
+        \item UAL: ASCII of Phred-scaled base QUALity+33
+    \end{enumerate}
+
+\end{itemize}\\
+
+\textbf{BAM:} Same format except that it is encoded in binary(faster to read) but not human legible.\\
+
+\textbf{CRAM:} Retains same info as SAM and is compressed in more efficient way.\\
+
+Formats are \textit{output} from aligners and assemblers 
+
+\textbf{BED Format:} Simple way to define basic sequence features to a sequence. One line per feature, each containing 3 - 12 columns of data plus optional track definition lines. Generally used for user defined sequence features as well as graphical representations of features.
+
+\begin{itemize}
+    \item Chromosome Name
+    \item Chromosome Start
+    \item Chromosome End 
+\end{itemize}
+
+\textbf{Optional Fields}
+Nine additional fields are optional for feature definition. If higher-numbered optional fields are used, all lower-numbered fields preceding them must also be populated.
+
+\begin{description}
+    \item[Name] Label to be displayed under the feature if enabled in the page configuration.
+    \item[Score] A numerical score ranging from 0 to 1000. The display style for scored data can be configured using track lines (see below).
+    \item[Strand] Defines the orientation of the feature: `+` (forward) or `–` (reverse).
+    \item[thickStart] The coordinate where the feature representation begins as a solid rectangle.
+    \item[thickEnd] The coordinate where the feature representation as a solid rectangle ends.
+    \item[itemRgb] An RGB color value (e.g., 0,0,255). This is applied only if a track line specifies `itemRgb="on"` (case-insensitive).
+    \item[blockCount] The number of sub-elements (e.g., exons) within the feature.
+    \item[blockSize] A comma-separated list of the sizes of these sub-elements.
+    \item[blockStarts] A comma-separated list of the start coordinates for each sub-element, relative to the feature's start coordinate.
+\end{description}
+
+\textbf{Track Lines}
+Track definition lines configure the display of features, such as grouping them into separate tracks. Track lines must precede the list of features they affect and consist of the word `track` followed by space-separated `key=value` pairs. Valid parameters for Ensembl include:
+
+\begin{description}
+    \item[name] A unique identifier for the track when parsing the file.
+    \item[description] A label displayed under the track in detailed views (e.g., "Region in Detail").
+    \item[priority] An integer determining the display order if multiple tracks are defined.
+    \item[color] Specified as RGB, hexadecimal, or an \href{https://www.X.org/releases/X11R7.6/doc/xorg-docs/specs/RGBColorNames.txt}{X11 named color}.
+    \item[useScore] A value from 1 to 4, dictating how scored data is displayed. May require additional parameters:
+    \begin{itemize}
+        \item Tiling array
+        \item Colour gradient (defaults to Yellow-Green-Blue with 20 grades). Optionally, custom colors (\texttt{cgColour1}, \texttt{cgColour2}, \texttt{cgColour3}) and the number of grades (\texttt{cgGrades}) can be specified.
+        \item Histogram
+        \item Wiggle plot
+    \end{itemize}
+    \item[itemRgb] If set to `on` (case-insensitive), the individual RGB values defined for each feature (in the `itemRgb` field) will be used.
+\end{description}
+
+\textbf{BedGraph Format}
+The BedGraph format is designed for displaying moderate amounts of scored data and is based on the BED format with these key differences:
+\begin{itemize}
+    \item The score is located in column 4 (instead of column 5 as in standard BED with score).
+    \item Track lines are \textbf{compulsory} and must include `type=bedGraph`.
+\end{itemize}
+Optional track line parameters currently supported by Ensembl for BedGraph are:
+\begin{description}
+    \item[name] (as described above)
+    \item[description] (as described above)
+    \item[priority] (as described above)
+    \item[graphType] Specifies the display style, either `bar` or `points`.
+\end{description}
+
+\end{literaturepaper}
+
+
+\begin{literaturepaper}{Latent Variable Models:}
+\label{background-info-2}
+\small
+
+In convolutional NN lie ResNet-50, there is no semantic understanding of images. Thus models require some form of understanding of uncertainty $\rightarrow$ \textbf{Generative Modeling}.
+
+It aims to model the entire distribution of the input data, including the relationship between the input data and their labels.
+
+Estimation of \textit{Joint Distribution} of input $X$ and labels $Y$.
+$P_\theta(X, Y) = P_\theta(Y|X) P_\theta(X)$ can be used to identify outlying data that doesn't belong to any of the trained classes. 
+\includegraphics[width = 7cm, height = 3cm]{encode_decode.png}
+
+Another example: \textit{fMRI signals} To generate synthetic data that closely resembles real (medical data sensitivity / privacy issues) for further research.
+
+\textbf{Goal:} To model input and estimate $P(X)$ 
+
+\textbf{Curse of Dimensionality:} As dimensionality of input increases, difficulty in modeling X significantly increases.
+
+\textbf{Pixel Dependency:} Statistical / spatial relationship between value (color/intensity) of one pixel and values of other pixels in an image. 
+\begin{itemize}
+    \item \textbf{Not independent:} If so, color of 1 pixel would convey 0 information about another pixel.
+    \item \textbf{Information Content:} Real-world images contain structure, objects, textures, patterns. They arise because color of 1 pixel is almost always related to the color of its neighboring pixels (and often to pixels further away.
+    \item \textbf{Predictability:} Dependencies imply predictability. IF color pixel $+$ dependencies are known, educated guess about color of adjacent pixel.
+\end{itemize}
+
+\textbf{Type Pixel Dependencies:}
+
+\begin{itemize}
+    \item \textbf{Local Dependencies:}
+    \begin{itemize}
+        \item \textbf{Spatial Correlation:} PIxels that are physically close to each other tend to have similar values. BLurring Filter average values from local neighborhood. 
+       \item \textbf{Edges and Textures:} Sharp change in pixel values over short distance and repeating patterns of pixel values (textures). (in CNN, model learns by looking at small, receptive field (neighborhoods) of pixels. Detection of edges, corners, blobs, based on dependencies within small window).
+    \end{itemize}
+    \item \textbf{Long-Range/Global Dependencies:} Pixels can also be related across larger distances.
+    \begin{itemize}
+        \item \textbf{Object Recognition}
+        \item \textbf{Contextual Information:} Interpretation OF pixel value can depend on overall context of image. e.g., Path of blue pixels might imply a sky in $X$ image but water in $Y$.
+        \item \textbf{Transformers in Vision:} Vvalue of a pixel can be predicted or generated based on the values of previously generated or observed pixels.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Approaches to modeling dependencies:}
+
+All pixels collectively form a dependence graph, where modeling dependencies is crucial for accurate joint probability estimation $\rightarrow$ highly challenging.
+
+\begin{itemize}
+    \item \textbf{Latent Variable Model} defines probability distribution $p(x,z) = p(x|z)p(z)$. \textbf{Sets of variables:} $x =$ Observed variables representing high dimensional observation. $z =$ latent variable not in observation space but hidden and associated with $x$ via $p(z|x)$ and \textbf{\textit{can encode structure of data.}} 
+
+    So idea is to generate hidden factors that generate observed variable $x$. \textbf{Assumption:} $X$ is generated by few independent hidden factors. e.g., \textit{image of face}, latent factors could control gender, eye color, glasses. Assume model $P(X)$ is generated by independent latent factors $Z_1, Z_2,...,Z_n$. Thus latent variable model defines a joint distribution of $P(X)$ and $Z$. (Baye's rule) 
+    \end{itemize}
+    
+    \textit{'how to learn the hidden factors (Z) when only the input (X) is known'}\\
+
+    \textbf{Autoencoder and Compression}
+
+    \begin{itemize}
+        \item Linear Encoder: $z = W^Tx$. Linear Decoder: $\hat{x} = Wz$. Minimum error solution $W$ yields same subspace as \textbf{PCA}.
+        \begin{itemize}
+            \item Project high -dimensional data into low-dimensional space and reconstruct input using low-D structure. $\rightarrow$ Simplify by employing linear mapping
+        \end{itemize}
+    \end{itemize}
+
+\textbf{Naïve Autoencoder} only learns to reconstruct $X$. (if $z$ has lower dimension than $X$). Latent representation exhibit gaps $\rightarrow$ challenging to infer physical meaning. \\
+
+\includegraphics[width=6cm, height=4cm]{autoencode_lower.png}\\
+
+Separability issues arise where certain regions where images from different digit categories may project into the same space. In \textbf{2D} one may struggle to discern physical meaning of dimensions. e.g., $Z_1$ may encode info about rotation which would be challenging to verify.
+
+\subsection*{Generative Modeling with Latent Variables}\\
+
+\textbf{Generative Process:} \textit{Derivation of Evidence Lower Bound (ELBO) for a latent variable model} (Variational Autoencoders (VAEs)).
+
+\begin{align*}
+\ln p_{\theta}(\mathbf{x}) &= \log \int p_{\theta}(\mathbf{x}|\mathbf{z})p_{\lambda}(\mathbf{z})d\mathbf{z} \\
+&= \log \int q_{\phi}(\mathbf{z}|\mathbf{x}) \frac{p_{\theta}(\mathbf{x}|\mathbf{z})p_{\lambda}(\mathbf{z})}{q_{\phi}(\mathbf{z}|\mathbf{x})} d\mathbf{z} \\
+&\ge \int q_{\phi}(\mathbf{z}|\mathbf{x}) \log \frac{p_{\theta}(\mathbf{x}|\mathbf{z})p_{\lambda}(\mathbf{z})}{q_{\phi}(\mathbf{z}|\mathbf{x})} d\mathbf{z} \quad \\
+&= \int q_{\phi}(\mathbf{z}|\mathbf{x}) \left[ \log p_{\theta}(\mathbf{x}|\mathbf{z}) + \log \frac{p_{\lambda}(\mathbf{z})}{q_{\phi}(\mathbf{z}|\mathbf{x})} \right] d\mathbf{z} \\
+&= \mathbb{E}_{\mathbf{z} \sim q_{\phi}(\mathbf{z}|\mathbf{x})} [\log p_{\theta}(\mathbf{x}|\mathbf{z})] - D_{KL}(q_{\phi}(\mathbf{z}|\mathbf{x}) || p_{\lambda}(\mathbf{z}))
+\end{align*}
+
+\textbf{Goal:} To maximize the marginal log-likelihood of observed data $X$ ($ln(P_\theta)$). $\rightarrow$ Probability of observing $X$ given $\theta$ (model parameters). Model assumes data is generated from latent variables $Z$ through a process $P_\theta(X|Z)$ (\textbf{Decoder}) and $Z$ is drawn from prior distribution $P_\lambda(Z)$ (\textbf{Marginal Prior}).\\
+
+\textbf{Derivation:}
+
+\begin{enumerate}
+    \item \textit{Introduction of latent variables:} Marginal likelihood is expressed by integrating out $Z$.
+
+$\ln p_{\theta}(\mathbf{x}) &= \log \int p_{\theta}(\mathbf{x}|\mathbf{z})p_{\lambda}(\mathbf{z})d\mathbf{z}$. 
+
+Where, $P_\theta(X|Z)$ is often modeled by \textit{decoder} and $P_\lambda$ is prior distribution over the latent variables. 
+
+    \item \textit{Introduction \textbf{Variational Posterior (Encoder)}:} Introduction of auxiliary distribution $q_\phi(Z|X)$ to make integral tractable. It aims to approximate posterior $P_\theta(Z|X)$.
+    \item \textit{Jensen's Inequality (deriving ELBO):} Since logarithm is concave function, \textbf{Jensen's Inequality ($logE[Y] \geq E[logY]$}, can be applied. Integral can be seen as expectation $E_{q_\theta(Z|X)...}$. THis leads to \textbf{Evidence Lower Bound (ELBO)}.
+
+    Inequality shows that log marginal likelihood $\geq$ ELBO.
+
+$&\ge \int q_{\phi}(\mathbf{z}|\mathbf{x}) \log \frac{p_{\theta}(\mathbf{x}|\mathbf{z})p_{\lambda}(\mathbf{z})}{q_{\phi}(\mathbf{z}|\mathbf{x})} d\mathbf{z} \quad$
+
+   \item \textit{Rewrite ELBO in terms of \textbf{Expectations and KL Divergence}}: 
+   
+    \textbf{Reconstruction Error/Likelihood:} $Z$ are sampled from the \textit{Variational Posterior ($q_\theta(Z|X)$)}. This encourages \textbf{decoder} to accurately reconstruct $X$ from $Z$ produced by \textbf{encoder} $q_\theta(Z|X)$
+    
+    $&= \mathbb{E}_{\mathbf{z} \sim q_{\phi}(\mathbf{z}|\mathbf{x})} [\log p_{\theta}(\mathbf{x}|\mathbf{z})]$
+
+    \item \textbf{KL Divergence as Regularization:} Kullback-Leibler divergence between $q_\phi(Z|X)$ and \textit{marginal posterior} $P_\lambda(Z)$. It measures how much 1 probability distribution differs from a 2nd reference probability distribution.
+    $D_{KL}(q_{\phi}(\mathbf{z}|\mathbf{x}) || p_{\lambda}(\mathbf{z}))$
+
+    Thus, maximizing ELBO $=$ minimizing KL divergence $\rightarrow$ \textbf{Regularization Term.} encouraging learned $q_\phi(Z|X)$ to be close to the \textbf{prior distribution} over latent variables $Z$ (Often chosen to be a simple distribution).
+\end{enumerate}
+
+\includegraphics[width=6cm, height=3cm]{eg_1.png}\\
+
+\includegraphics[width=6cm, height=4.3cm]{eg_2.png}\\
+
+\includegraphics[width=7.3cm, height=1.6cm]{eg_3.png}\\
+
+
+\end{literaturepaper}
+
+\begin{literaturepaper}{Graph Embeddings:}
+\label{background-info-3}
+\small
+\textit{Low-D representation of objects.} \\
+
+\textbf{Disentanglement:} Individual dimensions (or simpler linear combinations of dimensions - e.g., directions) inn embedding space have learn to capture \textit{distinct. independent, and interpretable} factor of variation in original data. In an ideally disentangled space for faces, one latent dimension might control "smile intensity," another "head pose," another "presence of glasses," and another "gender appearance" and one could \textbf{ADJUST} by moving along corresponding latent direction without significantly affecting others.  
+
+Models like VAEs learn an \textbf{encoder} to map an input object to $Z$ in embedding space and a \textbf{decoder} to map point $Z$ from this space back to the original data format. \textit{Navigating} such space implies e.g., moving from point $Z_1$ to $Z_n$. Movement may be interpolation or complex path.\\
+
+Let $Z \in \Re^D$ be a point in $d$-dimensional latent space. \\
+
+\textbf{Semantic Vectors}
+\begin{itemize}
+    \item $z_{A,Neutral}$ latent representation Person A neutral expression
+    \item $z_{A,Smile}$ 
+    \itemn 'smile vector' for Person A $v_{A,smile} = z_{A,smile} - z_{A,neutral}$.
+\end{itemize}
+
+\textit{To preserve topology and similarity (distance between similar nodes).} \\
+
+\textbf{Targets:}
+\begin{itemize}
+    \item Improve original data (node classification, link prediction, anomaly detection).
+    \item Downstrean ML tasks (clasification/Regression/CLustering/K-NN $\rightarrow$ QA/dialog systems, translation, image segmentation.
+\end{itemize}
+
+\textbf{Translational Approaches:} For predicting missing links, model relationships as a translation operation in embedding space.
+
+\textit{Entities} (nodes) and relations are mapped  to low-D vectors. A scoring (to min. for true triplets and max. for false triplets) measures plausibility of a triplet $(h , r, t)$  based on how well translation $h + r \approx t$ holds. \\
+
+\textbf{Triplet:} Single piece of factual information or entity in relationship. e.g., $(head)$Amsterdam $(relation)$is\_capital\_of $(tail)$Nederland\\
+
+
+\textbf{TransE:}
+
+Let $h, r, t \in \Re^d$ be d-dimensional embeddings for head entity, relation, tail entity.
+
+\textbf{Scoring/Energy function:} $f_r(h,t) = ||h + r - t||_{L_1/L_2}$ Dissimilarity / distance. (L1 or L2 norm). e.g., lower score $=$ triplet $(h,r,t)$ is more likely to be \textbf{TRUE}.
+
+\textbf{Objective function (margin-based ranking loss):} Model is trained to min. margin-based ranking loss which ensures that \textit{TRUE} triplets have \textit{lower scores (higher plausibility)} than corrupted triplets.
+$$
+\mathcal{L} = \sum_{(h,r,t) \in S} \sum_{(h',r,t') \in S_{(h,r,t)}'} \left[ \gamma + f_r(h,t) - f_r(h',t') \right]_{+}
+$$
+$S$ is set of TRUE triplets (observed), $S'_{(h,r,t)}$ is set corrupted triplets, $\gamma > 0$ is margin hyperparameter, ${x}_+ = max(0,x)$ is \textbf{hinge loss} $\rightarrow$  ''ensure that true triplets have more favorable score (in TransE, a lower dissimilarity score from $f_r(h,t)$ than corrupted or "negative" triplets by at least a certain margin $\gamma$''\\
+
+\textit{(Loss function)} To address corruption in negative triplets, remove either tail or head of an edge and replace it with another randomly. (Maximizing distance of negative triplets).
+
+Hinge loss incorporates scoring function to evaluate individual instances (TRUE vs Corrupted triplets) and defines how model should be penalized based on scores.
+
+Relies on positive information $\rightarrow$ over-optimization. THUS, \textit{Min. distance $+$ penalize when incorrect triplets are in close proximity.}\\
+
+Briefly, TransE learns vector representation (embeddings) to capture relationship geometrically in embedding space. Optimization goal is to align $h$, $edge$, $tail$ so minimize distance between sum of embeddings of positive triplet for all edges in knowledge graph and minimize negative triplets. \\
+
+\textbf{Tensor Factorization:} (not good for downstream machine learning tasks) Knowledge graph as multi-dimensional tensor. An entry in tensor $X_{hrt}$ $\rightarrow$ existence/truthfulness of triplet. \\
+
+\includegraphics[width=7cm, height=3cm]{factorization.png}\\
+
+\textbf{Algorithm examples:}\\
+
+\textbf{RESCAL (Resource Description Framework Schema)}:
+Let $h, t \in \Re^d$ be entity embeddings and $r$ (matrix \textbf{$M_r \in \Re^{d * d}$}) be relation embeddings/parameters.
+\textit{r} (relation), \textit{Scoring function} = $f(h,r,t) = h^TM_rt$. Equivalent to factorizing a 3D tensor $X$ where $X_{ijk} \approx e^T_iM_ke_j$ if $i,j$ are entities and $k$ is relation.\\
+
+\textbf{DistMult:} Simplifies RASCAL by restricting $M_r$, to be a \textit{diagonal matrix} represented by vector \textbf{r} $\in \Re^d$. \textit{Scoring function:} $$
+f(h,r,t) = \mathbf{h}^{\mathsf{T}} \text{diag}(\mathbf{r}) \mathbf{t} = \sum_{k=1}^{d} h_k r_k t_k
+$$
+\textit{Model is effective but can only model symmetric relations.}\\
+
+\textbf{ComplEx:} Uses complex-valued embeddings: $(h,r,t \in C^d$. \textit{Scoring function:} $f(h,r,t) = Re(h^T diag(r)\hat{t}$ where $\hat{t}$ is complex conjugate of $t$. \textit{Allows to model asymmetric relations}.\\
+
+\textbf{Random Walk-based:} Learn node embeddings by capturing notion of neighborhood similarity. Nodes that frequently co-occur on short random walks = similar and should have similar vector representation. (word2vec ((Skip-gram, CBOW))).
+
+\begin{itemize}
+    \item Generate large number of random walks from each node in graph. Walks = Sentences / sequence of nodes.
+    \item Use sequences as input to a Skip-gram model (or similar) to learn node embeddings of given target node. 
+\end{itemize}
+
+\subsection*{Layer-wise propagation rule for GCN} Reformulated to highlight its operation in terms of sparse matrix multiplications.
+
+\textit{Update rule:}
+$$
+\mathbf{H}^{(l+1)} = \sigma \left(\tilde{\mathbf{D}}^{-\frac{1}{2}} \tilde{\mathbf{A}} \tilde{\mathbf{D}}^{-\frac{1}{2}} \mathbf{H}^{(l)} \mathbf{W}^{(l)} \right)
+$$
+
+\begin{itemize}
+    \item $\mathbf{H}^{(l)}$ is the l-th layer in the unrolled network (the l-th time-step)
+    \item $\mathbf{A}$ is the adjacency matrix, $\tilde{\mathbf{A}}$ is the same with also the diagonal set to 1
+    \item $\tilde{D}_{ii} = \sum_j \tilde{A}_{ij} \quad \rightarrow \quad \text{Used for normalization}$
+    \item $\mathbf{W}^{(l)}$ is a learnable weight matrix for layer l
+\end{itemize}\\
+
+Each element $\hat{D}_{ii}$ is \textbf{degree of node} (number of edges connected to it) $i$ on the graph represented by $\hat{A}$. Since $\hat{A}$ include self-loops (symmetric for undirected loops), $\hat{D}_{ii}$ is calculated as sum of entries in $i-th$ row (or $i-th$ column):\\
+
+$\tilde{D_{ii}} = \sum_j\tilde{A_{ij}}}$\\
+
+$\tilde{\mathbf{D}}^{-\frac{1}{2}} \tilde{\mathbf{A}} \tilde{\mathbf{D}}^{-\frac{1}{2}}$ Represents specific form of \textbf{symmetric normalization} of $\tilde{A}$.
+
+Such normalization is crucial for:
+\begin{itemize}
+    \item Averaging neighbor features (avoid scale issues) prevents aggregated feature vectors - with high-degree - having $>>>$ magnitudes than those of low-degree
+    \item Controlling variance and stabilizing learning (keeping scale consistent)
+    \item Preventing dominance by high-degree nodes
+\end{itemize}
+
+\subsection*{Some info on Laplacian:}
+
+In \textit{spectral graph theory}, several different types \textbf{Laplacian matrices} available.\\
+
+\textbf{Unnormalized graph Laplacian}
+$$
+L^u = D - A
+$$
+
+\textbf{Symmetric normalized graph Laplacian}
+$$
+L^s = I - D^{-1/2}AD^{-1/2}
+$$
+
+$L^s$ is symmetric matrix, i.e. $L^s_{ij} = L^s_{ji}$. proof it is its own transpose:
+\begin{align*}
+(L^s)^{\mathsf{T}} &= \left(I - D^{-1/2}AD^{-1/2}\right)^{\mathsf{T}} \\
+&= I^{\mathsf{T}} - \left(D^{-1/2}AD^{-1/2}\right)^{\mathsf{T}} \\
+&= I - \left(D^{-1/2}\right)^{\mathsf{T}} \mathbf{A}^{\mathsf{T}} \left(D^{-1/2}\right)^{\mathsf{T}} \\
+&= I - D^{-1/2} \mathbf{A} D^{-1/2} \\
+&= L^s.
+\end{align*}
+
+$L^s = D^{-1/2} L^u D^{-1/2}$, \textbf{because:}
+\begin{align*}
+L^s &= I - D^{-1/2}AD^{-1/2} \\
+    &= D^{-1/2} DD^{-1/2} - D^{-1/2} AD^{-1/2} \\
+    &= D^{-1/2} (D - A) D^{-1/2} \\
+    &= D^{-1/2} L^u D^{-1/2}
+\end{align*}
+
+Transformation of multiplying $D^{-1/2}$ from left and from right ensures all rows and columns in adjacency matrix $\tilde{A}$ that involve a high-degree node $x$, say $\text{deg}(x) = d$, $d \gg 1$, get divided by a "small" number $\frac{1}{\sqrt{d}}$.\\
+
+In matrix multiplication form, the R-GCN is computed as follows:
+$$
+\mathbf{h}_i^{(l+1)} = \sigma \left( \sum_{r \in \mathcal{R}} \sum_{j \in \mathcal{N}_i^r} \frac{1}{c_{i,r}} \mathbf{W}_r^{(l)} \mathbf{h}_j^{(l)} + \mathbf{W}_0^{(l)} \mathbf{h}_i^{(l)} \right)
+$$
+
+\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt] % Adjust spacing if needed
+    \item $\mathbf{h}_j^{(l)}$: \textbf{Feature vector (or embedding)} of neighboring node $j$ of node $i$ (connected by relation $r$) from\textit{previous layer} $l$.
+
+    \item $\mathbf{h}_i^{(l)}$: \textbf{Feature vector of the node $i$ itself} (the node being updated) from the \textit{previous layer} $l$.
+
+    \item $\mathbf{W}_r^{(l)}$: Learnable weight matrix specific to \textbf{relation type $r$} at layer $l$. It transforms the features of the neighboring nodes $\mathbf{h}_j^{(l)}$.
+
+    \item $\mathbf{W}_0^{(l)}$: Learnable weight matrix for the \textbf{self-connection} of node $i$ at layer $l$. It transforms the features of the node $i$ itself, $\mathbf{h}_i^{(l)}$.
+
+    \item $\mathbf{W}_r^{(l)} \mathbf{h}_j^{(l)}$: Represents the \textbf{"message"} passed from neighbor $j$ to node $i$ along \textbf{relation $r$}. It's the transformed feature vector of the neighbor.
+
+    \item $\mathbf{W}_0^{(l)} \mathbf{h}_i^{(l)}$: Represents the \textbf{"message"} from node $i$ to itself (or the transformed self-features).
+
+    \item The sums $\sum_{r \in \mathcal{R}} \sum_{j \in \mathcal{N}_i^r}$ indicate that messages from all neighbors under all relation types are aggregated (summed after normalization by $1/c_{i,r}$).
+
+    \item $\mathbf{h}_i^{(l+1)}$ is new feature vector for node $i$ at the next layer $l+1$, after applying an activation function $\sigma$ to the sum of aggregated neighbor messages and the self-message.
+\end{itemize}
+
+For an edge from node $j$ to node $i$ (with edge type $r$ and potentially edge features $\mathbf{e}_{ji}$), the message $\mathbf{m}_{ji}^{(l)}$ might be:
+$$
+\mathbf{m}_{ji}^{(l)} = \text{MLP}_r(\mathbf{h}_j^{(l)}, \mathbf{h}_i^{(l)}, \mathbf{e}_{ji})
+$$
+
+\end{literaturepaper}
+
+\begin{literaturepaper}{Background info 2}
+\label{background-info-4}
+\small
+\subsection*{Ancestry Stratification:} Significant confounding factor. 
+Pipline should incorporate ancestry information to adjust filtering thresholds, select appropriate inference data highlight when variant's interpretations in sensitive to acenstry. \\
+
+\textbf{Accurate Allele Frequency:} Genetic variants can substantially differ across ancestral population.\\
+
+\textbf{gnomAD} provides ancestry-specific allele frequencies (European, African, East Asian,...). Linking variants to database using appropriate ancenstry-specific allele frequency is crucial for determining if $x$ variant is $truely$ rare in patient's ancestral group.  (What about individuals with a significant admixture from multiple ancestral populations?). (\textbf{$\neg$see} PM2, BA1, BS1 - ACMG/AMP guidelines).\\
+
+\textbf{Better interpretation VUS:} Individuals from non-EUR ancestry = more likely to receive VUS results because population = underrepresented in databases. 
+
+Better representation and ability to stratify by more granular ancestries can help resolve some VUS by providing more accurate background variation data for specific populations.  $\rightarrow$ Pipeline should weigh evidence differently/seek out ancestry-specific information when available.\\
+
+\textbf{Context for pathogenic variants:} Some variants may have higher prevalence in specific populations due to \textit{founder effects or bottlenecks}. $\rightarrow$ Automated variant reporting can include notes on population-specific prevalence if a known pathogenic variant is identified. \\
+
+\textbf{ML/DL Models} to multi-ethnic PRS (polygenic risk scores) development. PRS show variable performance across different ethnicities. Model will need to evaluated for performance across different ancestries. $\rightarrow$ Stratifying training/validation data by ancestry or using techniques to build ancestry-aware models can lead to more robust tools.  
+
+\textit{\textcolor{blue}{Prompt users for patient ancestry or integrate tools for genetic ancestry inference for interpretation.}}      
+\subsection*{Strategies:}
+
+\begin{itemize}
+    \item \textbf{Data Input:} Allow users of platform to specify patient's self-reported ancestry or integrate tools that can infer genetic ancestry from variant data (e.g., AIMs or PCA-based methods (aided by LLM?)).
+    \item \textbf{Database Queries:} When linking to gnomAD ensure retrieval and use of ancestry-specific allele frequencies.
+    \item \textbf{LLM Training/Fine-tuning:} Ensure training data includes diverse ancestries and considers ancestry-specific interpretations if available.
+    \item \textbf{Reporting:} Should clearly state which ancestral population data was used for frequency assessment and highlight any implications.
+    \item \textbf{Model Evaluation:} Test performance of classification pipeline across different ancestral groups to identify/mitigate potential biases.
+    \end{itemize}
+
+    For individuals substantially mixed, \textit{model must handle uncertainty or be provided with more nuanced ancestry information to make better-informed classifications.} \textbf{ADMIXTURE, RFMix, or PCA-based approaches} to estimate individual's proportional ancestry from different global populations.  Pipeline could accept proportions as inputs and weigh them for example. (see \textbf{LAI} computationally more expensive, though).
+                 
+\end{literaturepaper}
+
+\begin{literaturepaper}{Performance of deep-learning-based approaches to improve polygenic scores \cite{Kelemen2025PolygenicScores}}
+\label{paper-summary-3}
+\small
+\subsection*{Background info:} 
+\textbf{Risk Allele:} For a SNP, there are typically 2 possible alleles (variants). These alleles may be found to be associated with an increased risk of a disease or a higher value of a quantitative trait. \\
+
+\textbf{Genotype Encoding (0,1,2):} Numerical encoding of an individual's genotype at a specific SNP locus, based in the count of the risk allele. \textbf{\textit{Additive Model.}}\\
+
+Let us assume for a given SNP, 2 possible alleles are $A$ and $G$. Through GWAS it was determined that $G$ is the risk allele. The genotype $G_i$ for an individual at SNP $i$ is encoded as the number of $G$ allele the possess.
+
+\begin{itemize}
+    \item $G_i = 0$ $\rightarrow$ Homozygous for non risk
+    \item $G_i =1$ $\rightarrow$ Heterozygous 
+    \item $G_i = 2$ $\rightarrow$ Homozygous for risk
+\end{itemize}
+
+Most common encoding used in GWAS and PGS because it assume a \textbf{linear, additive effect}. \\
+
+\textbf{GWAS:} Approach used to identify associations between genetic variants (specifically SNPs) and a particular trait or disease. It involves scanning the genomes of many individuals to see which variants are statistically associated with the trait.
+
+\textit{Input data:} $N*M$ matrix where $N =$ number individuals, $M =$ number SNPs. $m_{ij} = \{0,1,2\}$ for $x_i$ at a SNP.
+
+\textit{Phenotype data:} A vector of length $N$ containing the trait measirement for $x_i$.
+
+\textit{Covariate data:} An $N*K$ matrix where $K$ is number of covariates (e.g., age, sex, PCA for ancestry) to control for confounding effects.
+
+\textbf{GWAS - Statistical Model:} Proceeds by performing a separate statistical test for each of the $M$ SNPs. For each SNP $i$, a regression model is fitted to test association between genotype $G_i$ and phenotype $Y$\\
+
+\textit{For Quantitative traits:}\\
+
+$Y = \beta_0+\beta_i G_i + \Sigma^K_{k=1}\gamma_k C_k + \epsilon$\\
+
+Where:
+\begin{itemize}
+    \item $\beta_i$ is the \textbf{effect size} or \textbf{weight} for SNP $i$. This is the primary value of interest representing average change in trait $Y$ for each additional copy of the risk allele
+    \item $C_k$ are the $K$ covariates
+    \item $\gamma_k$ are effect sizes for the covariates
+    \item $\beta_0$ intercept.
+    \item $\epsilon$ assumed to be normally distributed, $\epsilon \sim N(0, \sigma^2)$
+\end{itemize}
+
+\textit{For Binary traits:} Model for a single SNP $i$ is:
+\[
+\text{logit}(P(Y=1)) = \ln\left( \frac{P(Y=1)}{1 - P(Y=1)} \right) =\] 
+\[
+\beta_0 + \beta_i G_i + \sum_{k=1}^{K} \gamma_k C_k
+\]
+Where:
+\begin{itemize}
+    \item $Y=1$ for cases and $Y=0$ for controls
+    \item $P(Y=1)$ is probability of an individual being a case
+    \item Left side is \textbf{logarithm of the odds} (logit) of having the disease
+    \item $\beta_i$ is \textbf{log-odds ratio} for SNP $i$. Represents the change in the log-odds of having the disease for each additional copy of the risk allele. The odds ratio (OR) is calculated as $e^{\beta_i}$.
+\end{itemize}
+In both cases, the GWAS calculation involves fitting the appropriate model for millions of SNPs, each time estimating the effect size ($\beta_i$) and a p-value for the association.
+
+\textit{Weights:} ($w_i$) used to build a Polygenic Score (PGS) are the \textbf{effect sizes ($\beta_i$)} estimated from the GWAS regression models.
+
+\begin{itemize}
+    \item For a PGS predicting a quantitative trait, the weight $w_i$ for SNP $i$ is the $\beta_i$ value obtained from the linear regression.
+    \item For a PGS predicting disease risk, the weight $w_i$ for SNP $i$ is the $\beta_i$ value (the log-odds ratio) obtained from the logistic regression.
+\end{itemize}
+These weights are taken from the summary statistics of a large "discovery" GWAS and represent the estimated independent contribution of each SNP to the trait or disease.\\
+
+\textbf{Polygenic score (PGS or PRS):} Single value that estimates an individual's genetic predisposition for a specific trait or disease. It aggregates the effects of many genetic variants (SNPs typically) from across the genome into scores.
+
+\[PGS = \Sigma^M_{i=1}w_i * G_i$ \text{where M} = \text{Total number variants included in score}\]
+$w_i =$ effect size of variant $i$ (from GWAS summary statistics).
+
+$G_i =$ # risk alleles $(0,1,2)$ an individual has for variant $i$. 
+
+\begin{itemize}
+    \item \textbf{Purpose/application}: Risk stratification. Helps identify individuals within a population who have a higher or lower genetic susceptibility to complex diseases like coronary artery disease, type 2 diabetes, breast cancer.
+    \item PGS are influenced by many genes, each with a small effect, rather than single gene disorders. They are a \textit{probabilistic} measure that interacts with environmental and lifestyle factors. 
+    \item The accuracy of a PGS is often highest in individuals of the same ancestry as the population used for the initial GWAS from which the weights were derived.
+\end{itemize}
+
+\subsection*{Kelemen et al.}
+
+Simpler additive models calculate the score by just summing up the effects of individual genetic variants, assuming each one of them adds its own effect independently. 
+
+e.g.,
+\[PGS_{additive}=\Sigma^M_{i+1}w_iG_i\]
+\textbf{Functional Epistasis:} Refers to how genes and their protein products physically/biochemically interact in pathways.\\
+\textbf{Statistical Epistasis:} The combined effect of $2$ or more genes on a trait is different than just adding up their individual effects.
+
+For an additive model for a phenotype $Y$ based on $2$ SNPs, $G_A$ and $G_B$:
+\[ Y = \beta_0 + \beta_A G_A + \beta_BG_B + \epsilon \]
+
+if an interaction term is statistically significant:
+\[ Y = \beta_0 + \beta_A G_A + \beta_BG_B +  \beta_{AB}G_AG_B +\epsilon\]
+Statistical epistasis can also be caused by technical artifacts.\\
+
+\textbf{Biology}: We would conclude we've found biology if the non-linearity the NN learned corresponds to a $TRUE$ biological interaction between the products of different genes (i.e., functional epistasis leading to statistical epistasis).\\
+
+\textbf{Artifact:} It's considered an artifact if the non-linearity is simply a clever statistical trick the model learns to compensate for incomplete data without reflecting a real biological interaction.\\
+
+
+\textbf{Linkage Disequilibrium (LD):} Genetic variants that are physically close to each other on a chromosome are often inherited together, as there is a lower chance of a recombination even occurring between them. LD is the non-random association of alleles at different loci. May be quantified with e.g., $r^2$.\\
+
+\textbf{Causal variant:} Specific DNA change that directly influences a biological process and thus the phenotype\\
+
+\textbf{Tag SNP} is a variant that is measured in a study (e.g., on a genotyping array) that does not have a direct biological effect itself but is in high LD (highly correlated) with a nearby causal variant that might not have been measured. 
+
+Because tag SNP and the causal variant are almost always inherited together, a statistical association found for the tag SNP is actually acting as a \textit{proxy or tag} for the effect of the true causal variant. Thus \textbf{tag} $=$ \textit{'to serve as a proxy'}.\\
+
+\textbf{Joint Tagging Effects:} LD can create artifacts that mimic statistical epistasis.\\
+
+\includegraphics[width = 6cm, height = 3cm]{joint_taggging.png}\\
+
+\textit{A model might find that the combination SNP$1$ and SNP$2$  predicts the phenotype better than either alone, not because of a biological interaction between them but because together they form a better proxy/tag for the true causal variant SNP3.}\\
+
+Testing ability NN to capture non-linear effects in PGS generation while controlling for confounding by Linkage Disequilibrium (LD).
+
+\textbf{Data and Cohort:}
+\begin{itemize}
+    \item \textbf{Cohort:} Filtered to 125,000 unrelated individuals of European ancestry
+    \item \textbf{SNP Set:} Filtered to 1,188,672 HapMap3 SNPs with MAF $> 0.001$ and high imputation quality (INFO $> 0.9$)
+    \item \textbf{Data Split:} Cohort was split into training, validation, and test sets in 6:2:2 ratio
+    \item \textbf{Phenotypes:} 28 real traits were selected from the PGS Catalog, along with simulated phenotypes
+\end{itemize}
+
+The phenotype $Y$ is assumed to arise from the model:
+\[
+Y = G + E + G' \times E' + G' \times G' + E' \times E' + \epsilon
+\]
+where $G$ and $E$ are additive genetic and environmental components, $G' \times G'$ and $G' \times E'$ represent gene-gene and gene-environment interactions, and $\epsilon$ is noise.
+
+\textbf{Architecture:}
+\begin{itemize}
+    \item \textbf{Type:} MLPs with $3$ fully-connected hidden layers, implemented in PyTorch
+    \item \textbf{Configurations:} $2$ model sizes were tested $*$ phenotype$^{-1}$: Large model (100, 50, 25 neurons) and Small model (24, 12, 6 neurons)
+    \item \textbf{Hyperparameters:} Batch size 32, dropout 0.3, learning rate 0.001, batch normalization, and Softplus activation function
+\end{itemize}
+
+Study's method for quantifying nonlinear effects $\rightarrow$ comparing nonlinear NN with its linear counterpart.
+\begin{itemize}
+    \item \textbf{Nonlinear NN Model:} Standard MLP where output is  nested series of nonlinear activation functions $\sigma(\cdot)$:
+    \[ Y = \sigma_k(\dots\sigma_2(\sigma_1(XW_1)W_2)\dots W_k) \]
+    \item \textbf{Linear NN Model:} Same architecture but with all activation functions $\sigma(\cdot)$ removed. Model collapses into a single linear transformation:
+    \[ Y = (XW_1W_2\dots W_k) = XW_{\text{all}} \]
+    Difference in performance ($R^2$) between models, trained from scratch, was used to estimate the amount of nonlinearity learned by the nonlinear model
+\end{itemize}
+
+\textbf{Controlling for Joint Tagging Effects (LD Confounding):}
+$2$ strategies were tested to mitigate confounding by LD:
+\begin{enumerate}
+    \item \textbf{SNP-dosage weighting:} Multiplying input SNP allele dosages $[0,1,2]$ by their per-SNP weights from a pre-computed, LD-aware PGS (e.g., from PRS-CS). This provides model with \textit{LD-adjusted additive} information upfront
+    \item \textbf{LD-clumping + distance filtering:} A brute-force method to aggressively remove LD by keeping only $1$ SNP $*$ locus$^{-1}$ and ensuring no $2$ variants are closer than $500kb$. This is primarily used as reference to demonstrate the effect of removing LD entirely
+\end{enumerate}
+
+The key idea is that a single, true causal variant is often not directly measured in the data. Instead, several nearby genotyped SNPs which are correlated with the casual variant due to LD act as imperfect proxies for it.\\
+
+\textit{The simple additive model} sees effect of each tag SNP individually. If each tag is only weakly correlated with the true causal variant, the additive model struggles to capture the full effect of that casual variant. The NN, on the other hand, creates a more accurate complete structure/composite tag that better approximates the state the unobserved (true) causal variant. \\
+
+\textit{epistasis: deviation from additivity in a statistical model}. Thus, when a NN learns a non-linear function of multiple tag SNPs to better predict a \textit{single hidden additive effect}, the resulting model is non-additive w.r.t. observed tag SNP.
+
+
+\begin{enumerate}
+    \item \textbf{True (but hidden biology):} Consider an single, unmeasured causal $SNP(SNP_3)$ has a simple, additive effect on phenotype $Y$.
+    \item \textbf{Observed (incomplete) data:} Available $SNPs = SNP_1, SNP_2$. Each is imperfectly correlated with $SNP_3$ due to LD, thus neither is perfect proxies for $true$ causal signal.
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\subsection*{Example finding epistasis (gene-gene interaction)}:
+
+\textbf{Setup:}
+
+\textbf{Goal:} T determine if effect of one genetic variant (SNP A) on a disease depends on the genotype of another variant (SNP B).
+
+\begin{description}
+    \item[Phenotype ($Y$):] Cardiovascular disease, coded as binary trait where $Y=1$ for cases and $Y=0$ for controls
+    \item[Genetic Data ($G_A, G_B$):] Gnotype data for $2$ SNPs $=$ $\{SNP_A, SNP_B\}$
+    \item[Genotype Encoding:] Additive model. Genotype is encoded as count of risk allele $(0, 1, 2)$
+\end{description}
+
+\textbf{Mathematical Approach: Comparing Models:}
+Fit $2$ logistic regression models to data. The first assumes no interaction while second includes an \textit{interaction term}. Evidence for epistasis is found if the second model provides a significantly better fit to the data.
+
+\textbf{Additive Model ($H_0$):}
+Model the phenotype assuming each SNP contributes to the risk independently. This model tests the \textbf{additive effects} only
+The mathematical formulation for log-odds of having the disease is:
+\[
+\log\left( \frac{P(Y=1)}{1 - P(Y=1)} \right) = \beta_0 + \beta_A G_A + \beta_B G_B
+\]
+$\beta_A$ and $\beta_B$ are independent effects of SNP A and SNP B.
+
+\textbf{Interaction Model ($H_1$)}
+Build a model that tests for epistasis by including an interaction term ($G_A \times G_B$). \textit{ "Deviation from additivity in a statistical model"}
+\[
+\log\left( \frac{P(Y=1)}{1 - P(Y=1)} \right) = \beta_0 + \beta_A G_A + \beta_B G_B + \beta_{AB} G_A G_B
+\]
+The coefficient $\beta_{AB}$ is key. If $\beta_{AB}$ is significantly different from $0$ it provides evidence for statistical epistasis. The total effect of SNP A on the log-odds is now $(\beta_A + \beta$_{AB} G_B)$, which explicitly depends on the genotype of SNP B.
+
+\textbf{Statistical Test}
+
+Fit the interaction model and test the significance of the interaction coefficient, $\beta_{AB}$
+
+\begin{itemize}
+    \item \textbf{$H_0$:} There is no interaction ($\beta_{AB} = 0$).
+    \item \textbf{$H_1$:} There is an interaction ($\beta_{AB} \neq 0$).
+\end{itemize}
+
+Reject $H_0$
+
+\subsection*{Numerical Example}
+
+Consider data for 10 individuals. Note: Cases only appear when an individual has risk alleles at \textit{both} SNPs.
+
+\begin{table}[h!]
+\centering
+\caption{Hypothetical Data for Epistasis Analysis}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Individual} & \textbf{Phenotype (Y)} & \textbf{Genotype SNP A ($G_A$)} & \textbf{Genotype SNP B ($G_B$)} \\
+\midrule
+1 & 0 (Control) & 0 & 0 \\
+2 & 0 (Control) & 1 & 0 \\
+3 & 0 (Control) & 2 & 0 \\
+4 & 0 (Control) & 0 & 1 \\
+5 & 0 (Control) & 0 & 2 \\
+6 & 1 (Case) & 1 & 1 \\
+7 & 1 (Case) & 2 & 1 \\
+8 & 1 (Case) & 1 & 2 \\
+9 & 1 (Case) & 2 & 2 \\
+10 & 0 (Control) & 1 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Hypothetical Regression Results}:
+After fitting the interaction model from Step $2$ to this data, a stats package might produce the following results:
+
+\begin{table}[h!]
+\centering
+\caption{Hypothetical Logistic Regression Output for the Interaction Model}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Term} & \textbf{Coefficient ($\hat{\beta}$)} & \textbf{Standard Error} & \textbf{p-value} \\
+\midrule
+Intercept ($\beta_0$) & -5.0 & 2.0 & 0.012 \\
+$G_A$ ($\beta_A$) & 0.1 & 0.8 & 0.90 \\
+$G_B$ ($\beta_B$) & 0.2 & 0.9 & 0.82 \\
+\textbf{$G_A \times G_B$ ($\beta_{AB}$)} & \textbf{4.5} & \textbf{1.2} & \textbf{0.0002} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Interpretation}
+\begin{itemize}
+    \item Since p-values for individual coefficients, $\beta_A$ and $\beta_B$, are $(0.90, 0.82)$. Thus in an additive model neither SNP appears to have a significant effect on the disease by itself.
+    \item The p-value for the interaction coefficient, $\beta_{AB}$, is $(0.0002)$. Reject $H_0$ and conclude that a significant interaction effect exists.
+    \item Positive coefficient for $\beta_{AB}$ suggests that the risk of disease increases dramatically only when an individual carries risk alleles at \textit{both} loci simultaneously.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\textbf{Results:}
+\begin{itemize}
+    \item \textbf{Simulation Results:}
+    \begin{itemize}
+        \item In scenarios with genuine epistatic interactions, non-linear NNs outperformed linear NNs (e.g.,mean change in $R^2 = +10.9\%$)
+        \item Nonlinear NNs also outperformed linear NNs in additive scenarios ($R^2 = +3.7\%$) suggesting NNs can \textbf{exploit LD} to better model additive effects and can be mistakenly interpreted as evidence for epistasis 
+        \item SNP-dosage weighting strategy mitigated this confounding, reducing performance gap between nonlinear and linear NNs in additive scenarios with joint tagging effects from $+1.6\%$ to  $+0.2\%$
+    \end{itemize}
+    \item \textbf{Real Data Results ($28$ $UKB$ Phenotypes)}:
+    \begin{itemize}
+        \item When applied to real traits nonlinear NNs showed modest performance gain vs. linear NN (e.g., median change in $R^2$ of $+6.86\%$ for SNP-only models), suggesting true contribution of non-additive effects to phenotypic variance is limited
+        \item \textbf{Key Finding:} Linear and nonlinear NN models were \textbf{outperformed} by simpler baseline additive models (i.e., standard LD-aware PGS from PGS Catalog). NN models achieved only $\sim93\%$ to $\sim95\%$ of predictive accuracy of baseline linear models 
+    \end{itemize}
+\end{itemize}
+
+\textbf{While DL has potential, current application for improving PGS prediction is limited}. The performance gains of nonlinear NNs are often confounded by LD \textit{(joint tagging effects)} and after accounting for it the contribution of $TRUE$ non-additive effects is too small to make NNs outperform state-of-the-art additive PGS models. \textit{Results indicate NNs do not improve PGS with current data scales/methodologies.}
+
+\end{literaturepaper}
+
+\bibliography{references} % Link to your .bib file
+
+\end{document}
+
+
