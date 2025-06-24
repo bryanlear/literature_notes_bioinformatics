@@ -1,0 +1,83 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+\chapter{June $25^{th} / 2025$}
+\label{ch:tufte-design}
+
+\section{Simple Conceptual Pipeline }
+\hrulefill
+
+% For best practice, the \usetikzlibrary and \tikzstyle commands should be in the preamble
+% of your main.tex file. However, they are kept here to match your provided structure.
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit}
+
+\begin{figure}[htbp]
+    \centering
+    
+    \tikzstyle{startend} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=gray!20]
+    \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, text width=3cm, draw=black, fill=blue!20]
+    \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!20]
+    \tikzstyle{db} = [cylinder, shape border rotate=90, aspect=0.2, minimum height=1.5cm, text width=2.5cm, text centered, draw=black, fill=green!20]
+    \tikzstyle{decision} = [diamond, aspect=2, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=yellow!20]
+    \tikzstyle{report} = [rectangle, rounded corners, minimum width=3cm, minimum height=1.5cm, text centered, draw=black, fill=red!20, text width=3.5cm]
+    \tikzstyle{arrow} = [thick, ->, >=Stealth]
+    \tikzstyle{group} = [rectangle, rounded corners, draw=black!50, dashed, inner sep=10pt]
+
+    % Resize the whole tikz picture to fit the text width
+    \resizebox{\textwidth}{!}{
+        \begin{tikzpicture}[node distance=2cm and 1.5cm]
+        
+        % Nodes
+        \node (start) [startend] {Raw Sequencing Data (FASTQ)};
+        \node (qc) [process, below=of start] {1. Quality Control (FastQC)};
+        \node (align) [process, below=of qc] {2. Alignment to hg38 (BWA-MEM / DeepVariant)};
+        \node (postproc) [process, below=of align] {3. Post-processing (Sort, Index, Mark Duplicates)};
+        \node (call) [process, below=of postproc] {4. Variant Calling (HaplotypeCaller)};
+        \node (annotate) [process, below=of call] {5. Variant Annotation (VEP / SnpEff)};
+        
+        % Databases for Annotation
+        \node (gnomad) [db, left=of annotate, xshift=-2cm] {gnomAD};
+        \node (clinvar) [db, right=of annotate, xshift=2cm] {ClinVar};
+        
+        \draw [arrow] (gnomad) -- (annotate);
+        \draw [arrow] (clinvar) -- (annotate);
+        
+        % Core AI & Bayes Module
+        \node (bayes) [decision, below=of annotate, yshift=-1.5cm] {6. Bayesian VUS Assessment \\ $P(\text{Pathogenic} | \text{Data}, G)$};
+        
+        % Knowledge Graph Construction
+        \node (kg_pheno) [io, left=of bayes, xshift=-4cm] {Patient Phenotypes (HPO)};
+        \node (kg_ppi) [db, above=of kg_pheno] {STRING-DB};
+        \node (kg_gwas) [db, below=of kg_pheno] {GWAS Catalog / OMIM};
+        \node (kg_lit) [db, below=of kg_gwas] {PubMed (NLP for relations)};
+        
+        % Group for KG
+        \node[group, fit=(kg_pheno) (kg_ppi) (kg_gwas) (kg_lit), label={[xshift=1cm, yshift=-0.2cm]7. Cardiovascular KG Construction}] (kg_group) {};
+        
+        % Graph Neural Network
+        \node (gnn) [process, right=of bayes, xshift=4cm, fill=purple!20] {8. GNN Pathogenicity Prediction};
+        
+        % Final Report
+        \node (report) [report, below=of bayes, yshift=-1.5cm] {9. AI-Generated Clinical Report \\ (Variant, $P(\text{Patho.})$, KG Evidence, XAI Explanation)};
+        
+        % Arrows
+        \draw [arrow] (start) -- (qc);
+        \draw [arrow] (qc) -- (align);
+        \draw [arrow] (align) -- (postproc);
+        \draw [arrow] (postproc) -- (call);
+        \draw [arrow] (call) -- (annotate);
+        \draw [arrow] (annotate) -- (bayes);
+        \draw [arrow] (kg_group) -- (bayes);
+        \draw [arrow] (kg_group) -- (gnn);
+        \draw [arrow] (annotate) -- (gnn);
+        \draw [arrow] (bayes) -- (report);
+        \draw [arrow] (gnn) -- (report);
+        
+        \end{tikzpicture}
+    }
+    \caption{Conceptual pipeline example.}
+    \label{fig:dummy-pipeline}
+\end{figure}
+
+\end{document}
