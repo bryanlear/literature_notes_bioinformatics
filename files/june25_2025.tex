@@ -80,4 +80,36 @@
     \label{fig:dummy-pipeline}
 \end{figure}
 
+
+\section{Dataflow Programming} Paradigm that models a program as a directed graph of data flowing between operations. Specify independent tasks and the data dependencies between them, The program excecutes as data becomes available. 
+
+\subsection{Components}
+\begin{itemize}
+    \item \textbf{Processes}: Operations/ Nodes in graph. Self-contained independent script that performs x computational task. (e.g., command-line tool, Python / R scripts,...,)
+    \item\textbf{Channels}: Data Pipes / Edges. Asynchronous queues that connect processes. (sort of like a NN block or something like that).
+\end{itemize}
+
+\subsection{Flow Data}
+Driven entirely by the availability of data channels.
+\begin{itemize}
+  
+    \item \textbf{Initiation}:When $\geq 1$ initial channels are populated. Channel Factory ``Channel.somepath``
+    \item \textbf{Process Execution}  
+    \item \textbf{Implicit Parallelism}
+\end{itemize}
+
+\textbf{e.g., ``samtools`` pipeline}
+
+\begin{verbatim}
+Input Channel (e.g., a BAM file)
+      |
+      V
+[ samtools_sort ]
+      |
+      +-----------------+-----------------+
+      |                 |                 |
+      V                 V                 V
+[ samtools_idx ]  [ samtools_stats ]  [ samtools_flagstat ]
+
+\end{verbatim}
 \end{document}
