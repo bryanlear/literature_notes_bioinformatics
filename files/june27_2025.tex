@@ -1,5 +1,3 @@
-
-
 \documentclass[../main.tex]{subfiles}
 
 \begin{document}
@@ -145,8 +143,46 @@ Specific connection point where $2$ exons are ligated (joined) together after ha
     \caption{(a) Missense variants within a subportion of \textit{MYH7}, when identified in an HCM patient, have a 97\% prior probability of being pathogenic (etiological fraction; EF $=$ 0.97). We activate PM1 for missense variants in this region. Here we use \textit{MYH7:c.2221G>T} as an example (black bar). (b) Truncating variants in \textit{TTN} are only known to cause DCM when found in exons constitutively expressed in the heart (proportion spliced in $>$0.9). We activate PVS1\_strong for these variants. Here we use \textit{TTN:c.86641delC} as an example (black bar). (c) Variants that have been identified as pathogenic in paralogous genes may identify residues that are intolerant to variation. We have created two modified rules, PS1\_moderate and PM5\_supporting, to incorporate this evidence. Here we use \textit{KCNQ1:p.T311I} as an example. \textit{KCNQ2:p.T276I} is associated with Ohtahara syndrome. We activate PS1\_moderate for \textit{KCNQ1:p.T311I}, which is the equivalent missense change (i.e., same reference and alternate amino acids) in a different member of the same protein family.}
 \end{figure}
 
+\begin{tikzpicture}[
+    node distance=1.5cm and 2cm,
+    block/.style={rectangle, draw, fill=blue!10, text width=8em, text centered, rounded corners, minimum height=4em},
+    io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, draw, fill=green!10, text width=8em, text centered, minimum height=4em},
+    decision/.style={diamond, draw, fill=orange!10, text width=6em, text centered, aspect=1.5},
+    line/.style={draw, -{Stealth[length=2mm]}},
+    label/.style={font=\scriptsize\itshape}
+]
+
+% Nodes
+\node[io] (input) {Patient Whole-Genome Data \& VUS List};
+
+\node[block, below=of input] (alphagenome) {AlphaGenome Core Processing};
+\node[label, right=0.1cm of alphagenome, text width=12em, align=left, anchor=west] {A single model pass generates scores for each VUS across all modalities.};
+
+\node[block, below left=of alphagenome] (splicing) {Splicing Disruption Analysis};
+\node[block, below=of alphagenome] (expression) {Regulatory Impact Analysis (e.g., eQTLs)};
+\node[block, below right=of alphagenome] (ism) {Mechanistic Analysis (ISM)};
+
+\node[decision, below=2cm of expression] (integrate) {Integrate Functional Evidence};
+
+\node[io, below=of integrate, trapezium angle=80] (output) {Prioritized Candidate Variants for Clinical Review};
+
+% Faded box for AlphaGenome outputs
+\node[draw=gray, dashed, inner sep=0.5cm, fit=(splicing) (expression) (ism), label={[gray]above:Multimodal Outputs}] (outputs_box) {};
+
+% Arrows and Labels
+\path [line] (input) -- (alphagenome);
+\path [line] (alphagenome) -- node[label, left, pos=0.4] {Splicing Scores} (splicing);
+\path [line] (alphagenome) -- node[label, left] {Expression Scores} (expression);
+\path [line] (alphagenome) -- node[label, right, pos=0.4] {Contribution Scores} (ism);
+
+\path [line] (splicing) -- (integrate);
+\path [line] (expression) -- (integrate);
+\path [line] (ism) -- (integrate);
+
+\path [line] (integrate) -- (output);
 
 
+\end{tikzpicture}
 
 
 \end{document}
